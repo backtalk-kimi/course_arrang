@@ -2,72 +2,17 @@ import numpy as np
 import random
 import data_entire
 
-teacher_num=10
-course_num=20
-time_num=25 #一共有25个时间段
-room_num=5 #有5个教室
 
-# team_num=5
-
-
-class course_range:
-    def __init__(self,teacher,course,time,room):  #,team
-        self.teacher =teacher
-        self.course=course
-        self.time=time
-        self.room=room
-        # self.team=team
-
-def list_generation():  #列表使用中括号，生成初始解空间
-    l=[]
-    for i in range(20):
-        para=[]
-        for j in range(2):
-            # print('请输入第 %d 个3参数'%(j+1))
-            # #使用str.format() 进行格式化输出
-            # print('请输入第{}个参数:\n'.format(j+1))
-            # para_temp=input()
-            # para_temp=int(para_temp)
-            # para.append(para_temp)
-            if j==0:
-                para_temp=random.randint(1,25)
-            else:
-                para_temp=random.randint(1,5)
-            # elif j==2:
-            #     para_temp=random.randint(1,5)
-            # else:
-            #     para_temp=random.randint(1,5)
-
-            para.append(para_temp)
-
-        temp=course_range(int(i/2+1),i+1,para[0],para[1])
-        l.append(temp)
-    return l
-
-def group_generation(): #生成种群
-    g=[]
-    for i in range(30):
-        l=list_generation()
-        g.append(l)
-    return g
-
-g=group_generation()
+def group_generation(plan,num): #生成种群
+    group = list()
+    for i in range(num):
+        l=arrange_list(plan)
+        arrange_list.judge_conflict(l)
+        group.append(l)
+    return group
 
 
-def judge_conflict():
-    score = np.zeros(30, int)  # 给每个方案评分
-    # print(score[10])
-    for ans in range(30):
-        for i in g[ans]:
-            for j in g[ans]:
-                if (i.course!=j.course and i.teacher == j.teacher and i.time == j.time):
-                    score[ans]-=1
-                if (i.course != j.course and  i.time == j.time and i.room == j.room ):
-                    score[ans]-=1
-    return score
 
-# score=judge_conflict()
-# print(score)
 
 #交叉互换  每次迭代产生两个新的个体， 直接替换掉得分最低的两个个体
 def cross_action():
@@ -125,9 +70,9 @@ def cross_action():
     # return g
 
 def main():
-    for i in range(60):
-        print('第{}轮打分情况:\n'.format(i+1))
-        cross_action()
-    # for i in range(20):
-    #     print('第{}条排课:\n'.format(i+1),g[0][i].teacher , g[0][i].course , g[0][i].time , g[0][i].room)
+    plan = education_plan()
+    group_num = 100
+    g = group_generation(plan,group_num)
+    g.sort(key=arrange_list.score)
+
 main()
