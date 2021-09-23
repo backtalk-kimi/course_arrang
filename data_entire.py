@@ -7,7 +7,7 @@ import numpy as np
 import re
 import copy
 
-
+# 课程的安排方案，对应排课方案中的一条基因
 class course_range:
     def __init__(self,teacher,course,time,room):  #,team
         self.teacher =teacher
@@ -16,7 +16,16 @@ class course_range:
         self.room=room
         # self.team=team
 
+# 由文本读入教学方案
 class education_plan():
+    '''
+        Function :
+        Description :
+        Input :
+        Output :
+        Return :
+        Others :
+    '''
     def __init__(self):
         self.teachers = list()
         self.courses = list()
@@ -45,8 +54,9 @@ class education_plan():
         # print(course_num_week)
 
 
-
+# 排课方案的结构和方案定义，作为算法中的个体。基因由course_range组成
 class arrange_list():
+    #根据教学方案创建排课方案，课程安排由随机方法初始化
     def __init__(self,education_plan):
         l = list()
         for id in range(education_plan.length):
@@ -61,35 +71,7 @@ class arrange_list():
         self.class_num = education_plan.class_num
         self.teachers_num = education_plan.teachers_num
 
-    # def __init__(self,arrange_list,num):
-    #     self.gene_count = arrange_list.gene_count
-    #     self.time = arrange_list.time
-    #     self.class_num = arrange_list.class_num
-    #     self.teachers_num = arrange_list.teachers_num
-    #     l = list()
-    #     for id in range(arrange_list.gene_count):
-    #         temp = course_range(arrange_list[id].teacher, arrange_list[id].course, arrange_list[id].time, arrange_list[id].room)
-    #         l.append(temp)
-    #     self.arrange = l
-    #     self.score = arrange_list.score
-    # 变异过程程序
-    def variation(self, rate):
-        l = self.arrange
-        num = self.gene_count
-
-        # print("count = %d"%(num))
-
-        var_num = int(rate * num)
-        var_list = random.sample(range(num),var_num)
-        for id in range(var_num):
-            var = var_list[id]
-            # print("varnum:%d\tteacher:%d\tcourse:%d\ttime:%d\troom:%d" % (var,l[var].teacher, l[var].course, l[var].time, l[var].room))
-            l[var].time = random.randint(1, self.time)
-            l[var].room = random.randint(1, self.class_num)
-            # print("teacher:%d\tcourse:%d\ttime:%d\troom:%d" % (l[var].teacher, l[var].course, l[var].time, l[var].room))
-        self.arrange = l
-        return l
-
+    # 打印排课安排
     def list_display(self):
         l = self.arrange
         length = self.gene_count
@@ -97,14 +79,12 @@ class arrange_list():
             print("teacher:%d\tcourse:%d\ttime:%d\troom:%d" % (l[id].teacher, l[id].course, l[id].time, l[id].room))
         return
 
+    # 对本排课方案进行评分，本函数可以设置新的限制条件
     def judge_conflict(self):
 
         l = self.arrange
         score = 0
-
         workload = np.zeros((self.teachers_num,5),dtype=np.int)
-
-
         for i in range(self.gene_count):
         # 基本限制条件
             for j in range(i+1,self.gene_count):
@@ -122,6 +102,25 @@ class arrange_list():
                     score -= 1
         self.score = score
         return score
+
+        # 变异函数，rate表示变异率，设置变异基因占总基因数的比例
+    def variation(self, rate):
+        l = self.arrange
+        num = self.gene_count
+
+        # print("count = %d"%(num))
+
+        var_num = int(rate * num)
+        var_list = random.sample(range(num), var_num)
+        for id in range(var_num):
+            var = var_list[id]
+            # print("varnum:%d\tteacher:%d\tcourse:%d\ttime:%d\troom:%d" % (var,l[var].teacher, l[var].course, l[var].time, l[var].room))
+            l[var].time = random.randint(1, self.time)
+            l[var].room = random.randint(1, self.class_num)
+            # print("teacher:%d\tcourse:%d\ttime:%d\troom:%d" % (l[var].teacher, l[var].course, l[var].time, l[var].room))
+        self.arrange = l
+        arrange_list.judge_conflict(self)
+        return l
 
 # plan = education_plan()
 
@@ -143,7 +142,7 @@ def group_generation(plan,num): #生成种群
 
 
 
-
+# 基因交叉过程，entity_num为种群大小，cross_rate指进行交叉的个体在种群的比例，gene_rate指交叉过程中进行交叉的基因占总基因数的比例
 def cross_action(list, entity_num, cross_rate, gene_rate):
     cross_num = int(entity_num * cross_rate / 2)
     gene_count = list[0].gene_count
@@ -169,19 +168,38 @@ def cross_action(list, entity_num, cross_rate, gene_rate):
 
     return list
 
+def var_progress(var_rate,group_num,list):
+    var_num = int(var_rate * group_num)
+    var_list = random.sample(range(group_num), var_num)
+    for id in var_list:
+        arrange_list.variation(list[id], 0.3)
+
+
+
 def main():
     plan = education_plan()
     group_num = 300
     g = group_generation(plan,group_num)
     g.sort(key=lambda x:x.score,reverse = True)
+    # 初始种群中前50名优秀个体的得分
     for i in range(50):
         print("score[%d]=%d"%(i,g[i].score))
-    for i in range(200):
-        cross_action(g,group_num,0.2,0.2)
-        g.sort(key=lambda x: x.score, reverse=True)
-    print("_____________________________________________________")
-    for i in range(50):
-        print("score[%d]=%d"%(i,g[i].score))
+
+    while True:
+        print('请输入进化次数，回车键结束输入：')
+        loop_time = input()
+        loop_time = int(loop_time)
+        if loop_time == 0:
+            break
+        for i in range(loop_time):
+            cross_action(g,group_num,0.2,0.4)
+            var_progress(0.2,group_num,g)
+            g.sort(key=lambda x: x.score, reverse=True)
+        # 进化后种群总前50名优秀个体的得分,0表示该排课方案不存在冲突
+        for i in range(50):
+            print("score[%d]=%d"%(i,g[i].score))
+    # num = 0
+    # g[1].list_display()
 
 
 main()
