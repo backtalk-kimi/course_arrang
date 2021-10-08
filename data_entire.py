@@ -6,6 +6,11 @@ import random
 import numpy as np
 import re
 import copy
+import test
+
+# def plan_generate():
+
+
 
 # 课程的安排方案，对应排课方案中的一条基因
 class course_range:
@@ -18,14 +23,6 @@ class course_range:
 
 # 由文本读入教学方案
 class education_plan():
-    '''
-        Function :
-        Description :
-        Input :
-        Output :
-        Return :
-        Others :
-    '''
     def __init__(self):
         self.teachers = list()
         self.courses = list()
