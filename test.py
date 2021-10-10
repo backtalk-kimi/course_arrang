@@ -123,7 +123,7 @@ class generation():
                 t -= 1
 
                 teacher2 = self.course_teacher_dict[course['code']][1]
-                teacher_code = int(teacher1) % 10 - 1
+                teacher_code = int(teacher2) % 10 - 1
                 arrange_dict[count] = {'course_num': course_code + 1,
                                        'teacher_num': teacher_code,
                                        'weekly_course': t}
@@ -134,7 +134,6 @@ class generation():
                                        'teacher_num': teacher_code,
                                        'weekly_course': t}
                 count += 1
-                t -= 1
 
         self.arrange_dict = arrange_dict
         return arrange_dict

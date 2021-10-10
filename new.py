@@ -3,6 +3,7 @@ import time
 import geatpy as ea
 from test import generation
 from aimfunc import aimfunc
+from aimfunc import aimfunc1
 
 plan = generation()
 arrange = generation.arrange_plan_generation(plan)
@@ -16,17 +17,19 @@ b = list()
 varTypes = list()
 
 teacher_course = dict()
+class_course = dict()
 
 for i in range(plan.teacher_num):
     teacher_course[i] = []
-
+for i in range(3):
+    class_course[i] = []
 course_count = 0
 
 for course in range(course_num):
     for i in range(arrange[course]['weekly_course']):
+        class_course[course % 3].append(course_count)
         teacher_course[arrange[course]['teacher_num']].append(course_count)
         course_count += 1
-
         x1 = [0,3]
         x2 = [0,24]
         ranges.append(x1)
@@ -53,9 +56,42 @@ FieldD = np.vstack([precisions , # 各决策变量编码后所占二进制位数
 """=========================遗传算法参数设置========================"""
 Nind      = 100; # 种群个体数目
 MAXGEN    = 200; # 最大遗传代数
-maxormins = [1] # 列表元素为1则表示对应的目标函数是最小化，元素为-1则表示对应的目标函数是最大化
+selectStyle = 'tour' # 采用锦标赛选择
+recStyle  = 'xovdp' # 采用两点交叉
+mutStyle  = 'mutbin' # 采用二进制染色体的变异算子
+Lind = int(np.sum(FieldD[0, :])) # 计算染色体长度
+pc        = 0.7 # 交叉概率
+pm        = 1/Lind # 变异概率
+"""=========================开始遗传算法进化========================"""
+start_time = time.time() # 开始计时
+Chrom = ea.crtpc(Encoding, Nind, FieldD)
+Phen = ea.bs2ri(Chrom, FieldD)
+ObjV = aimfunc(Phen, teacher_course, class_course, Nind, course_count) # 计算初始种群个体的目标函数值
+
+FitnV = ea.ranking(ObjV) # 根据目标函数大小分配适应度值
+best_ind = np.argmax(FitnV) # 计算当代最优个体的序号
+# 生成初始种群
+for gen in range(MAXGEN):
+    SelCh = Chrom[ea.selecting(selectStyle,FitnV,Nind-1),:] # 选择
+    SelCh = ea.recombin(recStyle, SelCh, pc) # 重组
+    SelCh = ea.mutate(mutStyle, Encoding, SelCh, pm) # 变异
+    # 把父代精英个体与子代的染色体进行合并，得到新一代种群
+    Chrom = np.vstack([Chrom[best_ind, :], SelCh])
+    Phen = ea.bs2ri(Chrom, FieldD) # 对种群进行解码(二进制转十进制)
+    ObjV = aimfunc(Phen, teacher_course, class_course, Nind, course_count) # 求种群个体的目标函数值
+    FitnV = ea.ranking(ObjV) # 根据目标函数大小分配适应度值
+    # 记录
+    # best_ind = np.argmax(FitnV) # 计算当代最优个体的序号
+    # obj_trace[gen,0] = np.sum(ObjV)/ObjV.shape[0] #记录当代种群的目标函数均值
+    # obj_trace[gen,1] = ObjV[best_ind] #记录当代种群最优个体目标函数值
+    # var_trace[gen,:] = Chrom[best_ind,:] #记录当代种群最优个体的染色体
+
+"""=========================遗传算法参数设置========================"""
+Nind      = 100; # 种群个体数目
+MAXGEN    = 200; # 最大遗传代数
+maxormins = [-1] # 列表元素为1则表示对应的目标函数是最小化，元素为-1则表示对应的目标函数是最大化
 maxormins = np.array(maxormins) # 转化为Numpy array行向量
-selectStyle = 'tour' # 采用轮盘赌选择
+selectStyle = 'rws' # 采用轮盘赌选择
 recStyle  = 'xovdp' # 采用两点交叉
 mutStyle  = 'mutbin' # 采用二进制染色体的变异算子
 Lind = int(np.sum(FieldD[0, :])) # 计算染色体长度
@@ -64,14 +100,7 @@ pm        = 1/Lind # 变异概率
 obj_trace = np.zeros((MAXGEN, 2)) # 定义目标函数值记录器
 var_trace = np.zeros((MAXGEN, Lind)) # 染色体记录器，记录历代最优个体的染色体
 """=========================开始遗传算法进化========================"""
-start_time = time.time() # 开始计时
-Chrom = ea.crtpc(Encoding, Nind, FieldD)
-Phen = ea.bs2ri(Chrom, FieldD)
-ObjV = aimfunc(Phen, Chrom, teacher_course, Nind, course_count) # 计算初始种群个体的目标函数值
-
-FitnV = ea.ranking(ObjV) # 根据目标函数大小分配适应度值
-best_ind = np.argmax(FitnV) # 计算当代最优个体的序号
-# 开始进化
+#开始优化进化
 for gen in range(MAXGEN):
     SelCh = Chrom[ea.selecting(selectStyle,FitnV,Nind-1),:] # 选择
     SelCh = ea.recombin(recStyle, SelCh, pc) # 重组
@@ -79,14 +108,13 @@ for gen in range(MAXGEN):
     # 把父代精英个体与子代的染色体进行合并，得到新一代种群
     Chrom = np.vstack([Chrom[best_ind, :], SelCh])
     Phen = ea.bs2ri(Chrom, FieldD) # 对种群进行解码(二进制转十进制)
-    ObjV = aimfunc(Phen, Chrom, teacher_course, Nind, course_count) # 求种群个体的目标函数值
-    FitnV = ea.ranking(ObjV) # 根据目标函数大小分配适应度值
+    ObjV,CV = aimfunc1(Phen, teacher_course, class_course, Nind, course_count) # 求种群个体的目标函数值
+    FitnV = ea.ranking(ObjV, CV, maxormins) # 根据目标函数大小分配适应度值
     # 记录
     best_ind = np.argmax(FitnV) # 计算当代最优个体的序号
     obj_trace[gen,0] = np.sum(ObjV)/ObjV.shape[0] #记录当代种群的目标函数均值
     obj_trace[gen,1] = ObjV[best_ind] #记录当代种群最优个体目标函数值
     var_trace[gen,:] = Chrom[best_ind,:] #记录当代种群最优个体的染色体
-
 # 进化完成
 end_time = time.time() # 结束计时
 ea.trcplot(obj_trace, [['种群个体平均目标函数值', '种群最优个体目标函数值']]) # 绘制图像
@@ -100,7 +128,6 @@ for i in range(variable.shape[1]):
 print('用时：', end_time - start_time, '秒')
 
 variable = ea.bs2ri(var_trace[[199], :], FieldD) # 解码得到表现型（即对应的决策变量值）
-print(variable)
 
 count = 0
 result = list()
