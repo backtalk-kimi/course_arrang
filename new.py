@@ -5,6 +5,7 @@ from test import generation
 from aimfunc import aimfunc
 from aimfunc import aimfunc1
 
+# from openpyxl import Workbook ,load_workbook
 plan = generation()
 arrange = generation.arrange_plan_generation(plan)
 course_num = len(plan.arrange_dict)
@@ -119,7 +120,7 @@ for gen in range(MAXGEN):
 end_time = time.time() # 结束计时
 ea.trcplot(obj_trace, [['种群个体平均目标函数值', '种群最优个体目标函数值']]) # 绘制图像
 """============================输出结果============================"""
-best_gen = np.argmin(obj_trace[:, [1]])
+best_gen = np.argmax(obj_trace[:, [1]])
 print('最优解的目标函数值：', obj_trace[best_gen, 1])
 variable = ea.bs2ri(var_trace[[best_gen], :], FieldD) # 解码得到表现型（即对应的决策变量值）
 print('最优解的决策变量值为：')
@@ -131,6 +132,10 @@ variable = ea.bs2ri(var_trace[[199], :], FieldD) # 解码得到表现型（即�
 
 count = 0
 result = list()
+
+
+
+
 for i in range(course_num):
     for j in range(arrange[i]['weekly_course']):
         teacher = arrange[i]['teacher_num'] + 1
@@ -140,3 +145,33 @@ for i in range(course_num):
         print(teacher,course,room,time)
         result.append([teacher,course,room,time])
         count += 1
+
+# wb = Workbook()
+# ws = wb.active
+# ws.title = "course_arrangement"
+# ws.append(['course_num', 'teacher', 'course', 'time', 'room'])
+# for i in range(36):
+#     ws.append([i+1,result[i][0],result[i][1],int(result[i][3]),result[i][2]])
+#     # print(len(result))
+# wb.save('test.xlsx')
+# wb=load_workbook("test.xlsx")
+# sheets=wb.worksheets
+# for i in range(9):
+#     sheets[i+1].cell(1,1,'monday')
+#     sheets[i+1].cell(1, 2, 'tuesday')
+#     sheets[i+1].cell(1, 3, 'wednesday')
+#     sheets[i+1].cell(1, 4, 'thurday')
+#     sheets[i+1].cell(1, 5, 'friday')
+# for i in range(36):
+#     sheet_sub_room=result[i][2]
+#     date=int((result[i][3]-1)/5)+1
+#     time_section=(result[i][3]-1)%5+1
+#     course_sub=int((result[i][1]-1)/3)+1
+#     course_rank=result[i][1]%3
+#     if(course_rank==0): course_rank=3
+#
+#     sheets[sheet_sub_room].cell(time_section+1,date,"课程{}的第{}类课".format(course_sub,course_rank))
+#
+#     sheet_sub_teacher=result[i][0]+4
+#     sheets[sheet_sub_teacher].cell(time_section+1,date,"课程{}的第{}类课  教室：{}".format(course_sub,course_rank,result[i][2]))
+# wb.save("test.xlsx")

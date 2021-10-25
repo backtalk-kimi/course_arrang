@@ -70,7 +70,7 @@ def teacher_optimizer(teacher, matrix, population, teacher_course):
                 total_score[i] += (5-3)
     total_score += 1
     total_score = 5/total_score
-    print("teacher_optimizer = ",total_score)
+    # print("teacher_optimizer = ",total_score)
     return total_score
 
 def class_optimizer(lesson, matrix, population, class_course):
