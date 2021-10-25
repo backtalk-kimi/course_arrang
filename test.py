@@ -50,8 +50,9 @@ class generation():
         return self.teacher_num
 
     def course_count(self):
-        self.course_num = len(generation.courses)
-        return self.course_num
+        course_num = len(generation.courses)
+        self.course_num = course_num
+        return course_num
 
     def course_teacher_relation(self):
         dict = {}

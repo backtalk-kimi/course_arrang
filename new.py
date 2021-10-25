@@ -119,7 +119,7 @@ for gen in range(MAXGEN):
 end_time = time.time() # 结束计时
 ea.trcplot(obj_trace, [['种群个体平均目标函数值', '种群最优个体目标函数值']]) # 绘制图像
 """============================输出结果============================"""
-best_gen = np.argmin(obj_trace[:, [1]])
+best_gen = np.argmax(obj_trace[:, [1]])
 print('最优解的目标函数值：', obj_trace[best_gen, 1])
 variable = ea.bs2ri(var_trace[[best_gen], :], FieldD) # 解码得到表现型（即对应的决策变量值）
 print('最优解的决策变量值为：')
