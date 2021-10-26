@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas.tseries.offsets import CustomBusinessDay
 import datetime
+import numpy as np
 
 # help (CustomBusinessDay)
 def count_weekday(s_day, e_day):
@@ -42,5 +43,5 @@ def count_weekday(s_day, e_day):
 week_mask = str()
 week_mask += "Mon"
 print(week_mask)
-week_on = list([7])
-print()
+week_on = np.array(7)
+print(week_on)

@@ -32,12 +32,12 @@ import datetime
 # print(interval.days)
 
 class generation():
-    with open('排课入参测试数据.json', 'rb') as f:
+    with open('生态课表入参数据20211022.json', 'rb') as f:
         content = json.load(f)
     students = content['students']
     teachers = content['teachers']
     classroom = content['classrooms']
-    subject = content['subject']
+    # subject = content['subject']
     courses = content['courses']
     tools = content['tools']
     schedule = content['schedule']
@@ -46,8 +46,8 @@ class generation():
         return
 
     def course_count(self):
-        self.course_num = len(generation.courses)
-        return self.course_num
+        generation.course_num = len(generation.courses)
+        return
 
     def course_teacher_relation(self):
         dict = {}
@@ -69,7 +69,9 @@ class generation():
 # 根据校历计算课时数
     def schedule_info_read(self):
         week_mask = str()
-        week_on = np.array(7)
+        week_on = [0] * 7
+        date_list = list()
+
         week_on[0] = int(generation.schedule["monday"])
         week_on[1] = int(generation.schedule["tuesday"])
         week_on[2] = int(generation.schedule["wednesday"])
@@ -97,30 +99,27 @@ class generation():
         holiday_list = CustomBusinessDay(holidays=generation.schedule["holiday"], weekmask = week_mask)
         s_day = self.schedule["startTermBegin"]
         e_day = self.schedule["startTermEnd"]
-        bus_day = pd.date_range(start=s_day, end=e_day, freq='b')
-
-        # length = len(bus_day)
-        # extra_work_day = ['2021-10-09']
-        # extra_len = 0
-        # for i in extra_work_day:
-        #     if s_day <= i <= e_day:
-        #         extra_len = extra_len + 1
-
-        # work_data = length + extra_len
-        self.bus_day = bus_day
+        bus_day = pd.date_range(start=s_day, end=e_day, freq= holiday_list)
 
         day_period = list()
-        count = 0
-        period_sum = 0
+        times_sum = 0
         for day in bus_day:
             weekday = day.weekday() + 1
-            period = am_times[2 * weekday] * am_times[2 * weekday + 1] \
-                     + pm_times[2 * weekday] * pm_times[2 * weekday + 1]
-            day_period.append(period)
-            count += 1
-            period_sum += period
-        self.period_sum = period_sum
-        self.day_period = day_period
+            if week_on[weekday] == 1:
+                times = int(generation.schedule["lessonNumAm"]) + int(generation.schedule["lessonNumPm"])
+            if week_on[weekday] == 2:
+                times = int(generation.schedule["lessonNumAm"])
+            if week_on[weekday] == 3:
+                times = int(generation.schedule["lessonNumPm"])
+            day_period.append(times)
+            times_sum += times
+
+        generation.bus_day = bus_day
+        generation.day_period = day_period
+        generation.times_sum = times_sum
+        generation.week_on = week_on
+        generation.lessonNumAm = lessonNumAm
+        generation.lessonNumPm = lessonNumPm
         return bus_day
 
 # 科目信息读取,在教师信息之前读入
@@ -133,7 +132,7 @@ class generation():
         return
 # 老师信息读取和安排
     def teacher_info(self):
-        teacher_num = len(generation.teachers)
+        generation.teacher_num = len(generation.teachers)
         teacher_work = dict()
         for i in generation.teachers:
             for j in i["courseCode"]:
@@ -146,23 +145,11 @@ class generation():
     def course_info(self):
 
         return
+# 教室信息读取
+    def room_info(self):
+        return
 
-
- # 一周内每天的课程情况安排
-    def weekly_times(self):
-        days = 5
-        am_times = [3, 1] * days
-        pm_times = [2, 1] * days
-        dayly_times = [0] * days
-        for i in range(days):
-            dayly_times[i] = am_times[2*i] * am_times[2*i + 1] + pm_times[2*i] * pm_times[2*i + 1]
-        dayly_times = np.array(dayly_times)
-        weekly_times = dayly_times.sum()
-        self.dayly_times = dayly_times
-        self.weekly_times = weekly_times
-        return weekly_times
-
-
+ # 学期内每天的课程情况安排
     def arrange_plan_generation(self):
         generation.teacher_count(self)
 
@@ -209,5 +196,6 @@ class generation():
         return arrange_dict
 
 plan = generation()
-work_data, week_num = plan.schedule_info_read()
-print(work_data, week_num)
+plan.schedule_info_read()
+print(generation.week_on)
+# print(work_data, week_num)
