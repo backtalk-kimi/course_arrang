@@ -7,30 +7,6 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
-
-
-# def DateInput(str):
-#     date = str.split('-')
-#     for i in range(3):
-#         date[i] = int(date[i])
-#     someday = datetime.date(year=date[0],month=date[1],day=date[2])
-#     return someday
-#
-# schedule = content['schedule']
-# day1 = DateInput(schedule['startTermBegin'])
-# day2 = DateInput(schedule['startTermEnd'])
-# interval = day2 - day1
-# print(interval.days)
-#
-# schedule = content['schedule']
-# day1 = schedule['startTermBegin']
-# day2 = schedule['startTermEnd']
-#
-# day1 = datetime.datetime.strptime(day1,'%Y-%m-%d')
-# day2 = datetime.datetime.strptime(day2,'%Y-%m-%d')
-# interval = day2 - day1
-# print(interval.days)
-
 class generation():
     with open('生态课表入参数据20211022.json', 'rb') as f:
         content = json.load(f)
@@ -195,7 +171,11 @@ class generation():
         self.arrange_dict = arrange_dict
         return arrange_dict
 
+    def arrange_plan_generation(self):
+        return
+
+
 plan = generation()
-plan.schedule_info_read()
-print(generation.week_on)
+plan.course_info()
+print(generation.course_arrange)
 # print(work_data, week_num)
