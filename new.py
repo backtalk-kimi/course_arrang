@@ -7,7 +7,7 @@ from aimfunc import aimfunc1
 
 # from openpyxl import Workbook ,load_workbook
 plan = generation()
-arrange = generation.arrange_plan_generation(plan)
+# arrange = generation.arrange_plan_generation(plan)
 course_num = len(plan.arrange_dict)
 
 """============================变量设置============================"""

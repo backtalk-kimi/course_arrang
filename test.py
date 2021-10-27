@@ -8,7 +8,7 @@ import time
 import datetime
 
 class generation():
-    with open('生态课表入参数据20211022.json', 'rb') as f:
+    with open('生态课表入参参数V1.2.json', 'rb') as f:
         content = json.load(f)
     students = content['students']
     teachers = content['teachers']
@@ -98,84 +98,79 @@ class generation():
         generation.lessonNumPm = lessonNumPm
         return bus_day
 
-# 科目信息读取,在教师信息之前读入
-    def subject_info(self):
-        subject_num = len(generation.subject)
-        sub_tea_relation = dict()
-        for subject in generation.subject:
-            sub_tea_relation[subject['code']] = list()
-        self.sub_tea_relation = sub_tea_relation
-        return
+# # 科目信息读取,在教师信息之前读入
+#     def subject_info(self):
+#         subject_num = len(generation.subject)
+#         sub_tea_relation = dict()
+#         for subject in generation.subject:
+#             sub_tea_relation[subject['code']] = list()
+#         self.sub_tea_relation = sub_tea_relation
+#         return
 # 老师信息读取和安排
     def teacher_info(self):
         generation.teacher_num = len(generation.teachers)
-        teacher_work = dict()
+        teacher_work = [0] * generation.teacher_num
+        count = 0
         for i in generation.teachers:
-            for j in i["courseCode"]:
-                self.sub_tea_relation[j].append(i["idNo"])
-            teacher_work[i["idNo"]] = 0
+            # for j in i["subjectId"]:
+            #     self.sub_tea_relation[j].append(i["idNo"])
+
+            sub = i["subjectId"]
+            # print(sub,"+",type(sub))
+            if sub in generation.subject["teacher"]:
+                generation.subject["teacher"][sub].append(count)
+            else:
+                print("第",count,"老师无课")
+            # 在teacher字典中加入给每个老师安排课程和工作量安排
+            i["workload"] = 0
+            i["course"] = list()
+            count += 1
+
         self.teacher_work = teacher_work
         return
 
 # 课程信息读取和安排
     def course_info(self):
+        subject = dict()
+        subject["course"] = dict()
+        count = 0
+        for course in generation.courses:
+            sub_id = course["subjectId"]
+            if sub_id in subject["course"]:
+                subject["course"][sub_id].append(count)
+            else:
+                subject["course"][sub_id] = list()
+            count += 1
 
+        subject["teacher"] = dict()
+        for key in subject["course"]:
+            subject["teacher"][key] = list()
+        generation.subject = subject
+        self.teacher_info()
+
+        course_sum = 0
+        # 以下进行老师的工作分配
+        for s in subject["course"]:
+            course_list = subject["course"][s]
+            teacher_list = subject["teacher"][s]
+            for num in course_list:
+                period = generation.courses[num]["period"]
+                workload_list = list(map(lambda  x: generation.teachers[x]["workload"], subject["teacher"][s]))
+                min_teacher = teacher_list[(workload_list.index(min(workload_list)))] #找出当前工作量安排最少的老师，把这个course安排给他
+                generation.courses[num]["teacher"] = min_teacher
+                generation.teachers[min_teacher]["course"].append(num)
+                generation.teachers[min_teacher]["workload"] += period
+
+                course_sum += period
+                generation.course_sum = course_sum
+                # print(workload_list)
+        # generation.subject = subject
         return
 # 教室信息读取
     def room_info(self):
         return
 
- # 学期内每天的课程情况安排
-    def arrange_plan_generation(self):
-        generation.teacher_count(self)
-
-        generation.course_teacher_relation(self)
-        arrange_dict = dict()
-        count = 0
-        for course in self.courses:
-            course_code = int(course['code']) % 10 - 1
-            course_code = course_code * 3
-            if len(self.course_teacher_dict[course['code']]) == 1:
-                t = 3
-                for i in range(3):
-                    teacher = self.course_teacher_dict[course['code']][0]
-                    teacher_code = int(teacher) % 10 - 1
-                    arrange_dict[count] = {'course_num': course_code + i,
-                                           'teacher_num': teacher_code,
-                                           'weekly_course': t}
-                    count += 1
-                    t -= 1
-            else:
-                t = 3
-                teacher1 = self.course_teacher_dict[course['code']][0]
-                teacher_code = int(teacher1) % 10 - 1
-                arrange_dict[count] = {'course_num': course_code,
-                                       'teacher_num': teacher_code,
-                                       'weekly_course': t}
-                count += 1
-                t -= 1
-
-                teacher2 = self.course_teacher_dict[course['code']][1]
-                teacher_code = int(teacher2) % 10 - 1
-                arrange_dict[count] = {'course_num': course_code + 1,
-                                       'teacher_num': teacher_code,
-                                       'weekly_course': t}
-                count += 1
-                t -= 1
-
-                arrange_dict[count] = {'course_num': course_code + 2,
-                                       'teacher_num': teacher_code,
-                                       'weekly_course': t}
-                count += 1
-
-        self.arrange_dict = arrange_dict
-        return arrange_dict
-
-    def arrange_plan_generation(self):
-        return
-
-
-plan = generation()
-plan.course_info()
-print(generation.course_arrange)
+# plan = generation()
+# plan.course_info()
+# print(generation.subject)
 # print(work_data, week_num)
