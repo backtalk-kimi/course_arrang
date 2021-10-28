@@ -21,26 +21,26 @@ class generation():
     def __init__(self):
         return
 
-    def course_count(self):
-        generation.course_num = len(generation.courses)
-        return
+    # def course_count(self):
+    #     generation.course_num = len(generation.courses)
+    #     return
 
-    def course_teacher_relation(self):
-        dict = {}
-        for course in generation.courses:
-            dict[course['code']] = list()
-        for t in generation.teachers:
-            for c in t['courseCode']:
-                dict[c].append(t['idNo'])
-        self.course_teacher_dict = dict
-        return dict
+    # def course_teacher_relation(self):
+    #     dict = {}
+    #     for course in generation.courses:
+    #         dict[course['code']] = list()
+    #     for t in generation.teachers:
+    #         for c in t['courseCode']:
+    #             dict[c].append(t['idNo'])
+    #     self.course_teacher_dict = dict
+    #     return dict
 
-    def course_room_relation(self):
-        dict = {}
-        for course in generation.courses:
-            dict[course['code']] = course['classroomCode']
-        self.course_room_dict = dict
-        return dict
+    # def course_room_relation(self):
+    #     dict = {}
+    #     for course in generation.courses:
+    #         dict[course['code']] = course['classroomCode']
+    #     self.course_room_dict = dict
+    #     return dict
 
 # 根据校历计算课时数
     def schedule_info_read(self):
@@ -91,7 +91,7 @@ class generation():
             times_sum += times
 
         generation.bus_day = bus_day
-        generation.day_period = day_period
+        generation.day_period = day_period #每天对应哪几节课
         generation.times_sum = times_sum
         generation.week_on = week_on
         generation.lessonNumAm = lessonNumAm
@@ -140,11 +140,16 @@ class generation():
                 subject["course"][sub_id].append(count)
             else:
                 subject["course"][sub_id] = list()
+                subject["course"][sub_id].append(count)
             count += 1
 
         subject["teacher"] = dict()
+        subject["start"] = dict()
+        subject["end"] = dict()
         for key in subject["course"]:
             subject["teacher"][key] = list()
+            subject["start"][key] = list()
+            subject["end"][key] = list()
         generation.subject = subject
         self.teacher_info()
 
@@ -153,6 +158,8 @@ class generation():
         for s in subject["course"]:
             course_list = subject["course"][s]
             teacher_list = subject["teacher"][s]
+            subject["start"][s] = course_sum
+
             for num in course_list:
                 period = generation.courses[num]["period"]
                 workload_list = list(map(lambda  x: generation.teachers[x]["workload"], subject["teacher"][s]))
@@ -161,8 +168,12 @@ class generation():
                 generation.teachers[min_teacher]["course"].append(num)
                 generation.teachers[min_teacher]["workload"] += period
 
-                course_sum += period
-                generation.course_sum = course_sum
+                course_sum1 = course_sum + period
+                generation.courses[num]["start"] = course_sum
+                generation.courses[num]["end"] = course_sum1
+                course_sum = course_sum1
+
+            subject["end"][s] = course_sum
                 # print(workload_list)
         # generation.subject = subject
         return
@@ -171,6 +182,7 @@ class generation():
         return
 
 # plan = generation()
-# plan.course_info()
+# plan.schedule_info_read()
+# print(generation.times_sum)
 # print(generation.subject)
 # print(work_data, week_num)

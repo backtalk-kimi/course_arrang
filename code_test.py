@@ -40,8 +40,10 @@ def count_weekday(s_day, e_day):
 
 # if __name__ == '__main__':
 #     count_weekday('2021-9-1', '2022-1-30')
-week_mask = str()
-week_mask += "Mon"
-print(week_mask)
-week_on = np.array(7)
-print(week_on)
+# week_mask = str()
+# week_mask += "Mon"
+# print(week_mask)
+# week_on = np.array(7)
+# print(week_on)
+list = list(range(0, 5))
+print(list)

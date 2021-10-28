@@ -1,55 +1,23 @@
 import numpy as np
+from test import generation
 
-def teacher_condition(matrix, population, teacher_course):
-    num = len(teacher_course)
+def subject_in_order(Phen, population, plan):
+    matrix = np.array(Phen).T
     total_score = [0] * population
     total_score = np.array(total_score)
 
-    for teacher in range(num):
-        course_list = teacher_course[teacher]
-        count = len(course_list)
-        for i in range(count):
-            time1 = matrix[2*course_list[i] + 1]
-            for j in range(i + 1 , count):
-                time2 = matrix[2*course_list[j] + 1]
-                score = list(map((lambda x, y: 1 if x==y else 0), time1, time2))
+    for sub in plan.subject["course"]:
+        start = plan.subject["start"][sub]
+        end = plan.subject["end"][sub]
+        for i in range(start, end):
+            time1 = matrix[2 * i + 1]
+            for j in range(i, end):
+                time2 = matrix[2 * j + 1]
+                score = list(map(lambda x,y: 0 if x < y else 1, time1, time2))
                 score = np.array(score)
                 total_score = total_score + score
     return total_score
 
-def class_condition(matrix, population, class_course):
-    num = len(class_course)
-    total_score = [0] * population
-    total_score = np.array(total_score)
-
-    for count in range(num):
-        course_list = class_course[count]
-        for i in range(count):
-            time1 = matrix[2 * course_list[i] + 1]
-            for j in range(i + 1, count):
-                time2 = matrix[2 * course_list[j] + 1]
-                score = list(map((lambda x, y: 1 if x == y else 0), time1, time2))
-                score = np.array(score)
-                total_score = total_score + score
-    return total_score
-
-def total_condition(matrix, course_count, population):
-    count = len(matrix)
-    total_score = [0] * population
-    total_score = np.array(total_score)
-
-    for i in range(course_count):
-        room1 = matrix[2 * i]
-        time1 = matrix[2 * i + 1]
-        for j in range(i + 1, course_count):
-            room2 = matrix[2 * j]
-            time2 = matrix[2 * j + 1]
-            same_room = list(map((lambda x,y: 1 if x==y else 0), room1, room2))
-            same_time = list(map((lambda x,y: 1 if x==y else 0), time1, time2))
-            score = list(map((lambda x,y: 1 if x==y==1 else 0), same_room, same_time))
-            score = np.array(score)
-            total_score += score
-    return total_score
 
 def teacher_optimizer(teacher, matrix, population, teacher_course):
     day_course = np.zeros((population,5))
@@ -117,17 +85,17 @@ def aimfunc2(Phen , Nind, teacher_course, class_course):
     optimizer_score = optimizer_score.reshape(Nind, 1)
     return optimizer_score
 
-def aimfunc(Phen, teacher_course, class_course, Nind, course_count):
-    matrix = np.array(Phen).T
+
+
+def aimfunc(Phen, plan, Nind) :
+    # matrix = np.array(Phen).T
     CV_score = [0] * Nind
     CV_score = np.array(CV_score)
 
-    score1 = teacher_condition(matrix, Nind, teacher_course)
-    score2 = class_condition(matrix, Nind, class_course)
-    score3 = total_condition(matrix, course_count, Nind)
+    score1 = subject_in_order(Phen, Nind, plan)
+    CV_score = CV_score + score1
+    CV_score = CV_score.reshape(Nind, 1)
     # print(score2)
-    CV_score = score1 + score2 + score3
-    CV_score = CV_score.reshape(Nind,1)
     return CV_score
 
 def aimfunc1(Phen, teacher_course, class_course, Nind, course_count):
