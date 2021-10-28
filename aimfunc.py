@@ -18,72 +18,28 @@ def subject_in_order(Phen, population, plan):
                 total_score = total_score + score
     return total_score
 
+def sametime_statistics(entity, plan):
+    count_sum = plan.course_sum
+    time_dict = dict()
+    for i in range(count_sum):
+        time = entity[2 * i + 1]
+        if time in time_dict:
+            time_dict[time].append(i)
+        else:
+            time_dict[time] = list()
+            time_dict[time].append(i)
+    return time_dict
 
-def teacher_optimizer(teacher, matrix, population, teacher_course):
-    day_course = np.zeros((population,5))
-    course_list = teacher_course[teacher]
-    count = len(course_list)
 
-    total_score = [0] * population
-    total_score = np.array(total_score)
+def goal_tool_room_order(Phen, Nind, plan):
+    # for i in Phen:
+    #     entity = np.array(i).T
+    #     time_dict = sametime_statistics(entity, plan)
+    #     print(time_dict)
+    entity = np.array(Phen[0]).T
+    time_dict = sametime_statistics(entity, plan)
+    print(time_dict)
 
-    for i in course_list:
-        time = matrix[2 * i + 1, :]
-        time = time // 5
-        for j in range(population):
-            day_course[j][time[j]] += 1
-    for i in range(population):
-        for j in range(5):
-            if (day_course[i][j] > 3):
-                total_score[i] += (5-3)
-    total_score += 1
-    total_score = 5/total_score
-    # print("teacher_optimizer = ",total_score)
-    return total_score
-
-def class_optimizer(lesson, matrix, population, class_course):
-    day_course = list()                       #保存该班级每天的课程
-    day_num = np.zeros((population, 5))       #记录每天上课数
-    day_var = np.zeros(population)          #一周五天课程数的方差
-    day_rich = np.zeros(population)         #每天安排课程的丰富度
-    lesson_arrange_score = np.zeros(population)
-
-    course_list = class_course[lesson]
-    for i in range(population):
-        day_course.append({0:[],
-                          1:[],
-                          2:[],
-                          3:[],
-                          4:[]})
-    for i in course_list:
-        time = matrix[2*i + 1, :] // 5
-        for j in range(population):
-            day_course[j][time[j]].append(i // 6)
-            day_num[j][time[j]] += 1
-    for i in range(population):
-        day_var[i] = np.var(day_num[i ,:])
-    for i in range(population):
-        for j in range(5):
-            m = day_course[i][j]
-            day_set = set(m)
-            day_rich[i] = day_rich[i] + len(day_set)
-    lesson_arrange_score = day_var * 10 + day_rich
-    # print("class_optimizer = ", lesson_arrange_score)
-    return lesson_arrange_score
-
-def aimfunc2(Phen , Nind, teacher_course, class_course):
-    matrix = np.array(Phen).T
-    teacher_num = len(teacher_course)
-    class_num = len(class_course)
-    optimizer_score = np.zeros(Nind)
-    for i in range(teacher_num):
-        score = teacher_optimizer(i, matrix, Nind, teacher_course)
-        optimizer_score = optimizer_score + score
-    for i in range(class_num):
-        score = class_optimizer(i, matrix, Nind, class_course)
-        optimizer_score = optimizer_score + score
-    optimizer_score = optimizer_score.reshape(Nind, 1)
-    return optimizer_score
 
 
 
@@ -92,8 +48,9 @@ def aimfunc(Phen, plan, Nind) :
     CV_score = [0] * Nind
     CV_score = np.array(CV_score)
 
-    score1 = subject_in_order(Phen, Nind, plan)
-    CV_score = CV_score + score1
+    # score1 = subject_in_order(Phen, Nind, plan)
+    score2 = goal_tool_room_order(Phen, Nind, plan)
+    # CV_score = CV_score + score1
     CV_score = CV_score.reshape(Nind, 1)
     # print(score2)
     return CV_score
