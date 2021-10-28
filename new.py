@@ -15,6 +15,7 @@ precisions = list()
 scales = list()
 b = list()
 varTypes = list()
+course_list = list()
 
 times_sum = generation.times_sum
 for sub in generation.subject["course"]:
@@ -31,6 +32,9 @@ for sub in generation.subject["course"]:
             b.append([1, 1])
             b.append([1, 1])
             varTypes = np.hstack([varTypes, 1, 1])
+
+            course_list.append(cou)
+
 ranges = np.array(ranges).T
 b = np.array(b).T
 # for course in range(course_num):
@@ -82,7 +86,7 @@ Phen = ea.bs2ri(Chrom, FieldD)
 # print(Phen)
 # print(len(Phen[1]), generation.courses[cou]["end"])
 
-ObjV = aimfunc(Phen, plan, Nind)    # 计算初始种群个体的目标函数值
+ObjV = aimfunc(Phen, plan, Nind, course_list)    # 计算初始种群个体的目标函数值
 
 FitnV = ea.ranking(ObjV)            # 根据目标函数大小分配适应度值
 best_ind = np.argmax(FitnV)         # 计算当代最优个体的序号
@@ -94,7 +98,7 @@ for gen in range(MAXGEN):
     # 把父代精英个体与子代的染色体进行合并，得到新一代种群
     Chrom = np.vstack([Chrom[best_ind, :], SelCh])
     Phen = ea.bs2ri(Chrom, FieldD) # 对种群进行解码(二进制转十进制)
-    ObjV = aimfunc(Phen, plan, Nind)  # 求种群个体的目标函数值
+    ObjV = aimfunc(Phen, plan, Nind, course_list)  # 求种群个体的目标函数值
     FitnV = ea.ranking(ObjV)          # 根据目标函数大小分配适应度值
     # 记录
     best_ind = np.argmax(FitnV) # 计算当代最优个体的序号

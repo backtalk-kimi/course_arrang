@@ -31,25 +31,27 @@ def sametime_statistics(entity, plan):
     return time_dict
 
 
-def goal_tool_room_order(Phen, Nind, plan):
+def goal_tool_room_order(Phen, Nind, plan, course_list):
     # for i in Phen:
     #     entity = np.array(i).T
     #     time_dict = sametime_statistics(entity, plan)
     #     print(time_dict)
     entity = np.array(Phen[0]).T
     time_dict = sametime_statistics(entity, plan)
+    for time in time_dict:
+        course_list = time_dict[time]
     print(time_dict)
 
 
 
 
-def aimfunc(Phen, plan, Nind) :
+def aimfunc(Phen, plan, Nind, course_list) :
     # matrix = np.array(Phen).T
     CV_score = [0] * Nind
     CV_score = np.array(CV_score)
 
     # score1 = subject_in_order(Phen, Nind, plan)
-    score2 = goal_tool_room_order(Phen, Nind, plan)
+    score2 = goal_tool_room_order(Phen, Nind, plan, course_list)
     # CV_score = CV_score + score1
     CV_score = CV_score.reshape(Nind, 1)
     # print(score2)
