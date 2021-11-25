@@ -9,6 +9,7 @@ import time
 import datetime
 from dateutil import rrule
 from clustering import cluster
+import error_control
 from genetic import *
 import random
 
@@ -61,21 +62,7 @@ class generation():
         if week_on[6] != 0:
             week_mask += " Sun"
 
-        # generation.week_on = week_on
-        # x = week_on.count(0)
-        # x = 7-x
-        # generation.bus_length = len(bus_day)
-        # generation.bus_week = generation.bus_length/x
-        # week_times = 0
-        # for mask in week_on:
-        #     if mask == 1:
-        #         times = int(generation.schedule["lessonNumAm"]) + int(generation.schedule["lessonNumPm"])
-        #     if mask == 2:
-        #         times = int(generation.schedule["lessonNumAm"])
-        #     if mask == 3:
-        #         times = int(generation.schedule["lessonNumPm"])
-        #     week_times += times
-        # generation.week_times = week_times
+
         holiday_list = CustomBusinessDay(holidays=generation.schedule["holiday"], weekmask=week_mask)
         s_day = self.schedule["startTermBegin"]
         e_day = self.schedule["startTermEnd"]
@@ -177,34 +164,12 @@ class generation():
         return
 #教具信息读取
     def tool_info(self):
-        toolcode2Id = dict()
-        count = 0
+        toolcode2num = dict()
         for i in generation.tools:
-            toolcode2Id[i["code"]] = count
-            count += 1
-        generation.toolcode2Id = toolcode2Id
+            toolcode2num[i["code"]] = i["count"]
+        generation.toolcode2num = toolcode2num
         return
-# # 聚类里goal冲突设置
-#     def tongji(students):
-#         ###生成包含所有课程ID的矩阵
-#         course = np.zeros((300, 300))
-#         course = course.astype(int)
-#
-#         for i in students:
-#             if type(i['goalId']) == list:
-#                 for j in range(len(i['goalId'])):
-#                     for k in i['goalId'][j:]:
-#                         course[i['goalId'][j]][k] += 1
-#         p = {}
-#         for i in range(110):
-#             for j in range(i, 110):
-#                 if i != j and course[i][j] != 0:
-#                     # 该矩阵中ij项和ji项代表相同的约束条件，应当相加
-#                     p.update({(i, j): course[i][j] + course[j][i]})
-#
-#         q = sorted(p.items(), key=lambda d: d[1], reverse=True)
-#         # q1 = dict(q)
-#         return q
+
 
     def id2course(self):
         p = {}
@@ -299,7 +264,10 @@ class generation():
                 length = len(cluster_dict[clusterId]["sub_times"][subjectId])
                 subtime_sum = cluster_dict[clusterId]["sub_times"][subjectId][length - 1]
                 a = list(range(self.times_sum))
+                if subtime_sum > self.times_sum:
+                    error_control.error_info(301)
                 a = random.sample(a, subtime_sum)
+
                 a.sort()
                 time_num = 0
 
@@ -319,7 +287,7 @@ class generation():
                 course_list = cluster_dict[clusterId]["sub2cou"][subjectId]
                 for course in course_list:
                     for i in range(generation.courses[course]["period"]):
-                        b = Schedule(course, clusterId, teacherId, a[time_num])
+                        b = Schedule(course, clusterId, teacherId, generation.courses[course]["unitId"])
                         subject["course"].append(b)
                         time_num += 1
                 subject_arrange.append(subject)
@@ -342,6 +310,7 @@ def result_disply(schedules, plan, successMark):
                           "teacher" : plan.teachers[teacher]["teacherId"],
                           "lessonNo" : plan.courses[courseId]["lessonNo"],
                           "classroomNo" : plan.classroom[room]["classroomNo"],
+                          "unitId" : course.unitId,
                           "subjectId" : subjectId}
                 if toolcode != -1:
                     toolId = plan.toolcode2Id[toolcode]
@@ -353,6 +322,7 @@ def result_disply(schedules, plan, successMark):
                           "teacher": plan.teachers[teacher]["teacherId"],
                           "lessonNo": plan.courses[courseId]["lessonNo"],
                           "classroomNo": plan.classroom[room]["classroomNo"],
+                          "unitId": course.unitId,
                           "subjectId" : subjectId}
                 if toolcode != -1:
                     toolId = plan.toolcode2Id[toolcode]
@@ -405,7 +375,7 @@ def result_disply(schedules, plan, successMark):
                     new_dict["weeksSum"]    = 1
                     new_dict["scheduleDay"] = date.strftime("%Y-%m-%d")
                     new_dict["timePeriod"]  = timePeriod
-                    new_dict["unitId"]      = 0                     #数据缺失
+                    new_dict["unitId"]      = lesson["unitId"]
                     new_dict["semester"]    = plan.schedule["semester"]
                     new_dict["weekNo"]      = weekNo
                     new_dict["startTime"]   = "00:00:00"            #数据缺失
@@ -433,6 +403,6 @@ def result_disply(schedules, plan, successMark):
     with open('result.json', 'w') as f:
         f.write(result)
         f.close()
-    return result
+    return time_list
 
 

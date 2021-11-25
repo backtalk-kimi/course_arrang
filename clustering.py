@@ -14,7 +14,7 @@ class cluster:
     def embeding_build(plan):
         students = plan.students
         student_num = len(students)
-        goal_max = 300
+        goal_max = 1000
         std_embedding = np.zeros([student_num, goal_max])
         i = 0
         for student in students:
@@ -30,25 +30,28 @@ class cluster:
 
     def clustering(plan, clusters):
         std_num, embeding = cluster.embeding_build(plan)
-        kmeans = KMeans(n_clusters = clusters, random_state= 0, init='k-means++').fit(embeding)
-        # print(kmeans.labels_)
-        label_list = kmeans.labels_
-        # print(kmeans.cluster_centers_)
-        # print(kmeans.inertia_)
-        # print(kmeans.n_iter_)
-        # print(kmeans.n_features_in_)
-        # print(kmeans.feature_names_in_(2))
-        count = 0
-        cluster_dict = dict()
-        for i in label_list:
-            plan.students[count]["label"] = i
-            if i in cluster_dict:
-                cluster_dict[i]["students"].append(count)
-            else:
+        if std_num > clusters:
+            kmeans = KMeans(n_clusters = clusters, random_state= 0, init='k-means++').fit(embeding)
+
+            label_list = kmeans.labels_
+
+            count = 0
+            cluster_dict = dict()
+            for i in label_list:
+                plan.students[count]["label"] = i
+                if i in cluster_dict:
+                    cluster_dict[i]["students"].append(count)
+                else:
+                    cluster_dict[i] = dict()
+                    cluster_dict[i]["students"] = list()
+                    cluster_dict[i]["students"].append(count)
+                count += 1
+        else:
+            cluster_dict = dict()
+            for i in range(std_num):
                 cluster_dict[i] = dict()
                 cluster_dict[i]["students"] = list()
-                cluster_dict[i]["students"].append(count)
-            count += 1
+                cluster_dict[i]["students"].append(i)
         plan.cluster_dict = cluster_dict
         # help(kmeans)
         return

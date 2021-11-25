@@ -3,7 +3,13 @@ import numpy as np
 from genetic import *
 from pandas import *
 from generation import *
+import os
 
+path = 'result.json'
+if os.path.exists(path):  # 如果文件存在
+    os.remove(path)
+else:
+    print('no such file:',path)  # 则返回文件不存在
 
 plan = generation()
 schedules = plan.arrange()

@@ -4,10 +4,11 @@ import numpy as np
 import random
 
 class Schedule:
-    def __init__(self, courseId, classId, teacherId, time):
+    def __init__(self, courseId, classId, teacherId, unitId):
         self.courseId = courseId
         self.classId = classId
         self.teacherId = teacherId
+        self.unitId = unitId
         #print(courseId, classId, teacherId)
         # self.weekDay = 0
         # self.slot = 0
