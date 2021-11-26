@@ -191,73 +191,13 @@ class generation():
                     p[j].append(i)
         self.goalid2course = p
         return p
-    #
-    # def students_num(self, students, courses):
-    #     # id2course是一个字典，key是goalID，vaule是courses对应的在队列中的位置，{41:17}
-    #     id2cour = id2course(courses)
-    #     for a in courses:
-    #         a.update({'students_num': 0})
-    #     for i in students:
-    #         # j是goalId
-    #         if (type(i['goalId']) == list):
-    #             for j in i['goalId']:
-    #                 if (j in id2cour):
-    #                     courses[id2cour[j]].update({'students_num': courses[id2cour[j]]['students_num'] + 1})
-    #         # 另一种情况，goalId是一个int
-    #         elif (type(i['goalId']) == int):
-    #             if (i['goalId'] in id2cour):
-    #                 courses[id2cour[i['goalId']]]. \
-    #                     update({'students_num': courses[id2cour[i['goalId']]]['students_num'] + 1})
-    #     return courses
-    #
-    # '''=========统计subjects间的约束==========='''
-    #
-    # def course_ys_build(self):
-    #     goalId_ys = generation.tongji(generation.students)
-    #     # 建立goalId间的约束的字典，该字典键是两个goalId的有序元组，值是约束出现的次数
-    #     goalId_ys = dict(goalId_ys)
-    #     # cour_in_sub是字典，键是subject，值是courses的列表
-    #     cour_in_sub = generation.subject['course']
-    #     # sub_Id是所有subject的列表
-    #     sub_Id = list(cour_in_sub.keys())
-    #     course_ys = dict()
-    #     for i in range(len(sub_Id) - 1):
-    #         for j in sub_Id[i + 1:]:
-    #             for k in cour_in_sub[sub_Id[i]]:
-    #                 for l in cour_in_sub[j]:
-    #                     a = generation.courses[k]['goalId']
-    #                     b = generation.courses[l]['goalId']
-    #                     ys = 0
-    #
-    #                     if (a < b):
-    #                         if ((a, b) in goalId_ys):
-    #                             ys = ys + goalId_ys[(a, b)]
-    #                             course_ys[(k, l)] = ys
-    #                     elif (a > b):
-    #                         if ((b, a) in goalId_ys):
-    #                             ys = ys + goalId_ys[(b, a)]
-    #                             course_ys[(k, l)] = ys
-    #     # course_ys = sorted(course_ys, key=lambda x: x[1], reverse=True)
-    #     self.course_ys = course_ys
-    #     return course_ys
 
     def arrange(self):
         cluster_num = 4
         clustering = cluster(self, cluster_num)
         # clustering.display(self)
         subject_arrange = list()
-        # for i in generation.subject:
-        #     if generation.subject[i]["subjectNumber"] % self.bus_week == 0:
-        #         times = generation.subject[i]["subjectNumber"] // self.bus_week
-        #     else:
-        #         times = generation.subject[i]["subjectNumber"] // self.bus_week + 1
-        #     subject_arrange.append(int(times))
-        # course_num = sum(subject_arrange)
-        # s = []
-        # for class_id in range(cluster_num):
-        #     for i in range(course_num):
-        #         teacher_id = np.random.randint(1, 8, 1)[0]
-        #         s.append(Schedule(i, class_id, teacher_id, 1, 1))
+
         cluster_dict = self.cluster_dict
         for clusterId in cluster_dict:
             for subjectId in cluster_dict[clusterId]["sub2cou"]:
@@ -313,8 +253,9 @@ def result_disply(schedules, plan, successMark):
                           "unitId" : course.unitId,
                           "subjectId" : subjectId}
                 if toolcode != -1:
-                    toolId = plan.toolcode2Id[toolcode]
-                    lesson["tool"] = plan.tools[toolId]["code"]
+                    # toolId = plan.toolcode2Id[toolcode]
+                    # lesson["tool"] = plan.tools[toolId]["code"]
+                    lesson["tool"] = toolcode
                 time_list[time].append(lesson)
             else:
                 time_list[time] = list()
@@ -325,8 +266,9 @@ def result_disply(schedules, plan, successMark):
                           "unitId": course.unitId,
                           "subjectId" : subjectId}
                 if toolcode != -1:
-                    toolId = plan.toolcode2Id[toolcode]
-                    lesson["tool"] = plan.tools[toolId]["code"]
+                    # toolId = plan.toolcode2Id[toolcode]
+                    # lesson["tool"] = plan.tools[toolId]["code"]
+                    lesson["tool"] = toolcode
                 time_list[time].append(lesson)
 
     start = 0

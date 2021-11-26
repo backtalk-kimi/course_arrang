@@ -70,38 +70,66 @@ def conflict_judge(subject1, subject2, teachersame):
 
 
 
-def schedule_cost(population, elite):
+# def schedule_cost(population, elite):
+#     conflicts = []
+#     n = len(population[0])
+#     for entity in population:
+#         conflict = 0
+#         for i in range(0, n - 1):
+#             subject1 = entity[i]["course"]
+#             for j in range(i + 1, n):
+#                 subject2 = entity[j]["course"]
+#                 if entity[i]["teacher"] == entity[j]["teacher"]:
+#                     teachersame = 1
+#                 else:
+#                     teachersame = 0
+#                 conflict = conflict + conflict_judge(subject1, subject2, teachersame)
+#         conflicts.append(conflict)
+#
+#     index = np.array(conflicts).argsort()
+#     return index[: elite], conflicts[index[0]]
+
+def schedule_cost(ga, population, elite):
     conflicts = []
     n = len(population[0])
-    for entity in population:
-        conflict = 0
-        for i in range(0, n - 1):
-            subject1 = entity[i]["course"]
-            for j in range(i + 1, n):
-                subject2 = entity[j]["course"]
-                if entity[i]["teacher"] == entity[j]["teacher"]:
-                    teachersame = 1
-                else:
-                    teachersame = 0
-                conflict = conflict + conflict_judge(subject1, subject2, teachersame)
-        conflicts.append(conflict)
 
-    # n = len(population[0])
-    # for p in population:
-    #     conflict = 0
-    #     for i in range(0, n - 1):
-    #         for j in range(i + 1, n):
-    #         # check course in same time and same room
-    #             if p[i].roomId == p[j].roomId and p[i].weekDay == p[j].weekDay and p[i].slot == p[j].slot:
-    #                 conflict += 1
-    #             # check course for one class in the same time
-    #             if p[i].classId == p[j].classId and p[i].weekDay == p[j].weekDay and p[i].slot == p[j].slot:
-    #                 conflict += 1
-    #             # check course for one teacher in the same time
-    #             if p[i].teacherId == p[j].teacherId and p[i].weekDay == p[j].weekDay and p[i].slot == p[j].slot:
-    #                 conflict += 1
-    #
-    #     conflicts.append(conflict)
+    for entity in population:
+        time_list = [None] * ga.times_sum
+        for subject in entity:
+            teacherId = subject["teacher"]
+            for lesson in subject["course"]:
+                time = lesson.time
+                toolcode = lesson.tool
+                classroom = lesson.roomId
+                if time_list[time] == None:
+                    time_list[time] = dict()
+                    time_list[time]["teacherId"] = dict()
+                    time_list[time]["toolcode"] = dict()
+                    time_list[time]["roomId"] = dict()
+                if teacherId in time_list[time]["teacherId"]:
+                    time_list[time]["teacherId"][teacherId] += 1
+                else:
+                    time_list[time]["teacherId"][teacherId] = 1
+                if toolcode in time_list[time]["toolcode"]:
+                    time_list[time]["toolcode"][toolcode] += 1
+                else:
+                    time_list[time]["toolcode"][toolcode] = 1
+                if classroom in time_list[time]["roomId"]:
+                    time_list[time]["roomId"][classroom] += 1
+                else:
+                    time_list[time]["roomId"][classroom] = 1
+        score = 0
+        for time in time_list:
+            if time:
+                for teacherId in time["teacherId"]:
+                    score += time["teacherId"][teacherId] - 1
+                for classroom in time["roomId"]:
+                    score += time["roomId"][classroom] - 1
+                for toolcode in time["toolcode"]:
+                    if toolcode != -1:
+                        if time["toolcode"][toolcode] > ga.toolcode2num[toolcode]:
+                            score += time["toolcode"][toolcode] - ga.toolcode2num[toolcode]
+        conflicts.append(score)
     index = np.array(conflicts).argsort()
     return index[: elite], conflicts[index[0]]
 
@@ -221,8 +249,9 @@ class GeneticOptimize:
         bestScore = 0
         bestSchedule = None
         self.init_population(schedules, plan)
+        self.toolcode2num = plan.toolcode2num
         for i in range(self.maxiter):
-            eliteIndex, bestScore = schedule_cost(self.population, self.elite)
+            eliteIndex, bestScore = schedule_cost(self, self.population, self.elite)
             print('Iter: {} | conflict: {}'.format(i + 1, bestScore))
             if bestScore == 0:
                 bestSchedule = self.population[eliteIndex[0]]

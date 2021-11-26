@@ -30,29 +30,28 @@
    "students":
    [
       {
-         "classId":18,
+         "classId":17,
          "goalId":
          [
             236,
-            237
+            237,
+            234,
+            248,
+            249
          ],
-         "name":"刘梅梅",
-         "idNo":"1678",
+         "name":"孙小亮",
+         "idNo":"1289",
          "orgId":2
       },
       {
          "classId":17,
          "goalId":
          [
-            246,
-            245,
-            243,
-            242,
             236,
             237,
             234,
-            239,
-            240
+            232,
+            225
          ],
          "name":"李小伟",
          "idNo":"1024",
@@ -62,29 +61,11 @@
          "classId":17,
          "goalId":
          [
-            225,
-            245,
-            243,
-            242,
-            236,
-            237,
-            234,
-            239,
-            240,
-            246
+            232,
+            225
          ],
          "name":"测试学生",
          "idNo":"1001",
-         "orgId":2
-      },
-      {
-         "classId":18,
-         "goalId":
-         [
-            243
-         ],
-         "name":"王小军",
-         "idNo":"1022",
          "orgId":2
       }
 
@@ -92,112 +73,79 @@
    "courses":
    [
       {
-         "period":2,
-         "lessonNo":121,
-         "goalId":242,
-         "unitName":"数学第二单元",
+         "period":4,
+         "lessonNo":132,
+         "goalId":248,
+         "unitName":"语文第三单元",
          "sortNumber":1.0,
-         "name":"生活数学",
-         "unitId":43,
+         "name":"生活语文",
+         "unitId":47,
          "typeId":1,
-         "subjectId":2
+         "subjectId":1
       },
       {
-         "period":2,
-         "lessonNo":122,
-         "goalId":243,
-         "unitName":"数学第二单元",
+         "period":4,
+         "lessonNo":133,
+         "goalId":249,
+         "unitName":"语文第三单元",
          "sortNumber":2.0,
-         "name":"生活数学",
-         "unitId":43,
+         "name":"生活语文",
+         "unitId":47,
          "typeId":1,
-         "subjectId":2
+         "subjectId":1
       },
       {
          "period":4,
-         "lessonNo":123,
-         "goalId":245,
-         "unitName":"数学第二单元",
+         "lessonNo":127,
+         "goalId":225,
+         "unitName":"语文第一单元",
          "sortNumber":3.0,
-         "name":"生活数学",
-         "unitId":43,
+         "name":"生活语文",
+         "unitId":45,
          "typeId":1,
-         "subjectId":2
+         "subjectId":1
       },
       {
          "period":4,
-         "lessonNo":124,
-         "goalId":246,
-         "unitName":"数学第二单元",
+         "lessonNo":128,
+         "goalId":232,
+         "unitName":"语文第一单元",
          "sortNumber":4.0,
-         "name":"生活数学",
-         "unitId":43,
+         "name":"生活语文",
+         "unitId":45,
          "typeId":1,
-         "subjectId":2
+         "subjectId":1
       },
       {
          "period":2,
-         "lessonNo":118,
+         "lessonNo":129,
          "goalId":234,
          "unitName":"语文第二单元",
          "sortNumber":5.0,
          "name":"生活语文",
-         "unitId":42,
+         "unitId":46,
          "typeId":1,
          "subjectId":1
       },
       {
          "period":4,
-         "lessonNo":119,
+         "lessonNo":130,
          "goalId":236,
          "unitName":"语文第二单元",
          "sortNumber":6.0,
          "name":"生活语文",
-         "unitId":42,
+         "unitId":46,
          "typeId":1,
          "subjectId":1
       },
       {
          "period":4,
-         "lessonNo":120,
+         "lessonNo":131,
          "goalId":237,
          "unitName":"语文第二单元",
          "sortNumber":7.0,
          "name":"生活语文",
-         "unitId":42,
-         "typeId":1,
-         "subjectId":1
-      },
-      {
-         "period":2,
-         "lessonNo":115,
-         "goalId":225,
-         "unitName":"语文第一单元",
-         "sortNumber":8.0,
-         "name":"生活语文",
-         "unitId":40,
-         "typeId":1,
-         "subjectId":1
-      },
-      {
-         "period":4,
-         "lessonNo":116,
-         "goalId":239,
-         "unitName":"数学第一单元",
-         "sortNumber":9.0,
-         "name":"生活语文",
-         "unitId":41,
-         "typeId":1,
-         "subjectId":1
-      },
-      {
-         "period":4,
-         "lessonNo":117,
-         "goalId":240,
-         "unitName":"数学第一单元",
-         "sortNumber":10.0,
-         "name":"生活语文",
-         "unitId":41,
+         "unitId":46,
          "typeId":1,
          "subjectId":1
       }
@@ -206,12 +154,12 @@
    "subjects":
    [
       {
-         "subjectNumber":50,
+         "subjectNumber":14,
          "subjectId":1,
          "subjectName":"生活语文"
       },
       {
-         "subjectNumber":50,
+         "subjectNumber":12,
          "subjectId":2,
          "subjectName":"生活数学"
       },
@@ -323,18 +271,6 @@
          "typeId":1
       },
       {
-         "code":25,
-         "name":"派出所",
-         "count":1,
-         "typeId":13
-      },
-      {
-         "code":26,
-         "name":"居委会",
-         "count":1,
-         "typeId":13
-      },
-      {
          "code":27,
          "name":"微笑",
          "count":1,
@@ -363,31 +299,13 @@
          "name":"出租车",
          "count":1,
          "typeId":11
-      },
-      {
-         "code":34,
-         "name":"飞机",
-         "count":1,
-         "typeId":11
-      },
-      {
-         "code":35,
-         "name":"公交车",
-         "count":1,
-         "typeId":11
-      },
-      {
-         "code":36,
-         "name":"火车",
-         "count":1,
-         "typeId":11
       }
 
    ],
    "schedule":
    {
-      "startTermBegin":"2021-09-30",
-      "startTermEnd":"2021-10-15",
+      "startTermBegin":"2021-09-01",
+      "startTermEnd":"2021-09-17",
       "lessonNumAm":4,
       "lessonNumPm":4,
       "timeLength":40,
