@@ -249,7 +249,7 @@ def result_disply(schedules, plan, successMark):
                 lesson = {"cluster" : cluster,
                           "teacher" : plan.teachers[teacher]["teacherId"],
                           "lessonNo" : plan.courses[courseId]["lessonNo"],
-                          "classroomNo" : plan.classroom[room]["classroomNo"],
+                          "classroomNo" : plan.classroom[room]["classroomCode"],
                           "unitId" : course.unitId,
                           "subjectId" : subjectId}
                 if toolcode != -1:
@@ -262,7 +262,7 @@ def result_disply(schedules, plan, successMark):
                 lesson = {"cluster": cluster,
                           "teacher": plan.teachers[teacher]["teacherId"],
                           "lessonNo": plan.courses[courseId]["lessonNo"],
-                          "classroomNo": plan.classroom[room]["classroomNo"],
+                          "classroomNo": plan.classroom[room]["classroomCode"],
                           "unitId": course.unitId,
                           "subjectId" : subjectId}
                 if toolcode != -1:
@@ -323,7 +323,7 @@ def result_disply(schedules, plan, successMark):
                     new_dict["startTime"]   = "00:00:00"            #数据缺失
                     new_dict["endTime"]     = "00:00:00"            #数据缺失
                     new_dict["tmpClassId"]  = tmpClassId
-                    new_dict["statusFlag"]  = 0
+                    new_dict["statusFlag"]  = 1
 
                     timeTableList.append(new_dict)
 
