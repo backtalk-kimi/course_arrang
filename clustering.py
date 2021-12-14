@@ -3,11 +3,12 @@
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.cluster import DBSCAN
 
 
 class cluster:
     def __init__(self, plan, cluster_num = 3):
-        cluster.clustering(plan, cluster_num)
+        cluster.clustering_kmeans(plan, cluster_num)
         self.cluster_goalid_generate(plan)
         self.subject_arrange(plan)
         return
@@ -28,7 +29,7 @@ class cluster:
             i += 1
         return student_num, std_embedding
 
-    def clustering(plan, clusters):
+    def clustering_kmeans(plan, clusters):
         std_num, embeding = cluster.embeding_build(plan)
         if std_num > clusters:
             kmeans = KMeans(n_clusters = clusters, random_state= 0, init='k-means++').fit(embeding)
@@ -84,12 +85,16 @@ class cluster:
             for j in cluster_dict[i]["goalId"]:
                 if j not in id2course:
                     print("goal",j,"has no course")
-                    break
-                cluster_course = cluster_course + id2course[j]
+                    # global infomation
+                    # infomation += 'goal,%d,has no course'%(j)
+                    # break
+                else:
+                    cluster_course.append(id2course[j][0])
             cluster_course = list(set(cluster_course))
 
             cluster_dict[i]["sub2cou"] = dict()
             cluster_dict[i]["sub_times"] = dict()
+            times_total = 0
             for k in subject_dict:
                 cluster_course = set(cluster_course)
                 sub_cor_set = set(subject_dict[k]["course"])
@@ -101,13 +106,50 @@ class cluster:
                     length = len(temp)
                     count = 0
                     temp1 = list()
-                    while(times < subject_dict[k]["subjectNumber"]):
+                    # while(times < subject_dict[k]["subjectNumber"]):
+                    #     times = times + plan.courses[temp[count]]["period"]
+                    #     subject_times.append(times)
+                    #     temp1.append(temp[count])
+                    #     count = (count + 1) % length
+                    # for course_temp in temp:
+                    #     times += plan.courses[course_temp]["period"]
+                    # if times < plan.subject[k]["subjectNumber"]:
+                    #     course_num_list = [0] * length
+                    #     while (times < subject_dict[k]["subjectNumber"]):
+                    #         times = times + plan.courses[temp[count]]["period"]
+                    #         course_num_list[count] += 1
+                    #         count = (count + 1) % length
+                    #     times = 0
+                    #     for temp_i in range(length):
+                    #         for temp_j in range(course_num_list[temp_i]):
+                    #             times = times + plan.courses[temp[temp_i]]["period"]
+                    #             subject_times.append(times)
+                    #             temp1.append(temp[temp_i])
+                    # else:
+
+
+
+
+                    course_num_list = [0] * length
+                    while (times < subject_dict[k]["subjectNumber"]):
                         times = times + plan.courses[temp[count]]["period"]
-                        subject_times.append(times)
-                        temp1.append(temp[count])
+                        course_num_list[count] += 1
                         count = (count + 1) % length
+                    times = 0
+                    for temp_i in range(length):
+                        if course_num_list[temp_i] == 0:
+                            print("cluster", i,"subject", k, "course", plan.courses[temp[temp_i]]["lessonNo"],"is not in arrange")
+                            # global infomation
+                            # infomation += 'cluster, %d,subject, %d, course, %s,课时数不足'%(i,k,plan.courses[temp[temp_i]]["lessonNo"])
+                        else:
+                            for temp_j in range(course_num_list[temp_i]):
+                                times = times + plan.courses[temp[temp_i]]["period"]
+                                subject_times.append(times)
+                                temp1.append(temp[temp_i])
                     cluster_dict[i]["sub2cou"][k] = temp1
                     cluster_dict[i]["sub_times"][k] = subject_times
+                    times_total += times
+            cluster_dict[i]["times_total"] = times_total
 
         plan.cluster_dict = cluster_dict
         return

@@ -1,6 +1,7 @@
 #coding=UTF-8
 import json
 # error_code = 301, 学期课时数不足以初始化subject安排
+# error_code = 000, subjectnum未设置
 def error_info(error_code = 300):
     result = dict()
     result["code"] = error_code

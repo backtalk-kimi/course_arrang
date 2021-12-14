@@ -97,6 +97,7 @@ def schedule_cost(ga, population, elite):
         time_list = [None] * ga.times_sum
         for subject in entity:
             teacherId = subject["teacher"]
+            clusterId = subject["cluster"]
             for lesson in subject["course"]:
                 time = lesson.time
                 toolcode = lesson.tool
@@ -106,6 +107,7 @@ def schedule_cost(ga, population, elite):
                     time_list[time]["teacherId"] = dict()
                     time_list[time]["toolcode"] = dict()
                     time_list[time]["roomId"] = dict()
+                    time_list[time]["cluster"] = dict()
                 if teacherId in time_list[time]["teacherId"]:
                     time_list[time]["teacherId"][teacherId] += 1
                 else:
@@ -118,6 +120,10 @@ def schedule_cost(ga, population, elite):
                     time_list[time]["roomId"][classroom] += 1
                 else:
                     time_list[time]["roomId"][classroom] = 1
+                if clusterId in time_list[time]["cluster"]:
+                    time_list[time]["cluster"][clusterId] += 1
+                else:
+                    time_list[time]["cluster"][clusterId] = 1
         score = 0
         for time in time_list:
             if time:
@@ -145,40 +151,75 @@ class GeneticOptimize:
         self.maxiter = maxiter
         
     #随机初始化不同的种群
-    def init_population(self, schedules, plan):
+    def init_population(self, cluster_arrange, plan):
         self.population = []
         self.times_sum = plan.times_sum
+        # for i in range(self.popsize):
+        #     for subject in schedules:
+        #         a = list(range(plan.times_sum))
+        #         a = random.sample(a, subject["subtime_sum"])
+        #         a.sort()
+        #         for count in range(subject["subtime_sum"]):
+        #             subject["course"][count].random_init(a[count], plan)
+        #     self.population.append(copy.deepcopy(schedules))
+
+        cluster_dict = plan.cluster_dict
         for i in range(self.popsize):
-            entity = []
-            for subject in schedules:
+            subject_arrange = list()
+            for clusterId in cluster_arrange:
+                times_total = cluster_arrange[clusterId]["times_total"]
                 a = list(range(plan.times_sum))
-                a = random.sample(a, subject["subtime_sum"])
+                a = random.sample(a, times_total)
                 a.sort()
-                for count in range(subject["subtime_sum"]):
-                    subject["course"][count].random_init(a[count], plan)
-            self.population.append(copy.deepcopy(schedules))
+                for s in cluster_arrange[clusterId]["subject"]:
+                    subtime_sum = s["subtime_sum"]
+                    b = random.sample(a, subtime_sum)
+                    for time in b:
+                        a.remove(time)
+                    b.sort()
+                    count = 0
+
+                    subject = dict()
+                    subject["cluster"] = s["cluster"]
+                    subject["subjectId"] = s["subjectId"]
+                    subject["subtime_sum"] = s["subtime_sum"]
+                    subject["teacher"] = s["teacher"]
+                    subject["course"] = list()
+                    subjectId = s["subjectId"]
 
 
-            # entity = []
-            # for s in schedules:
-            #     s.random_init(roomRange)
-            #     entity.append(copy.deepcopy(s))
-            # self.population.append(entity)
+                    course_list = cluster_dict[clusterId]["sub2cou"][subjectId]
+                    for course in course_list:
+                        for i in range(plan.courses[course]["period"]):
+                            c = Schedule(course, s["cluster"], s["teacher"], plan.courses[course]["unitId"])
+                            c.random_init(b[count], plan)
+                            count += 1
+                            subject["course"].append(c)
+                            # time_num += 1
+                    subject_arrange.append(subject)
+            self.population.append(subject_arrange)
+
             
     #变异
-    def mutate(self, eiltePopulation, roomRange, slotnum, plan):
+    def mutate(self, eiltePopulation, plan):
         #选择变异的个数
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         for subject in ep:
-            pos = np.random.randint(0, 4, 1)[0]
-            if pos == 0:
-                self.time_change(subject)
-            elif pos == 1:
-                self.room_change(subject, plan)
-            elif pos == 2:
-                self.tool_change(subject, plan)
-        
+            if subject["course"][0].tool == -1:
+                pos = np.random.randint(0, 2, 1)[0]
+                if pos == 0:
+                    self.time_change(subject)
+                elif pos == 1:
+                    self.room_change(subject, plan)
+            else:
+                pos = np.random.randint(0, 3, 1)[0]
+                if pos == 0:
+                    self.time_change(subject)
+                elif pos == 1:
+                    self.room_change(subject, plan)
+                elif pos == 2:
+                    self.tool_change(subject, plan)
         return ep
 
     # def time_change(self, subject):
@@ -190,7 +231,7 @@ class GeneticOptimize:
     #     return
 
     def time_change(self, subject):
-        time_mutate_rate = 0.2
+        time_mutate_rate = 0.3
         lesson_length = subject["subtime_sum"]
         # a = list(map(lambda x : subject["course"][x].time, [y for y in range(lesson_length)]))
         mutate_num = int(lesson_length * time_mutate_rate)
@@ -245,10 +286,10 @@ class GeneticOptimize:
                         ep1[i]["course"][j].tool = ep2[i]["course"][j].tool
         return ep1
 
-    def evolution(self, schedules, roomRange, slotnum, plan):
+    def evolution(self, cluster_arrange, plan):
         bestScore = 0
         bestSchedule = None
-        self.init_population(schedules, plan)
+        self.init_population(cluster_arrange, plan)
         self.toolcode2num = plan.toolcode2num
         for i in range(self.maxiter):
             eliteIndex, bestScore = schedule_cost(self, self.population, self.elite)
@@ -259,7 +300,7 @@ class GeneticOptimize:
             newPopulation = [self.population[index] for index in eliteIndex]
             while len(newPopulation) < self.popsize:
                 if np.random.rand() < self.mutprob:
-                    newp = self.mutate(newPopulation, roomRange, slotnum, plan)
+                    newp = self.mutate(newPopulation, plan)
                 else:
                     newp = self.crossover(newPopulation)
                 newPopulation.append(newp)
