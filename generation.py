@@ -224,29 +224,34 @@ class generation():
                 subject["subjectId"] = subjectId
                 subject["subtime_sum"] = subtime_sum
                 workload_min = 65535
-                teacher_length = len(generation.subject[subjectId]["teacher"])
-                for teacherId in generation.subject[subjectId]["teacher"]:
-                    if generation.teachers[teacherId]["workload"] < workload_min:
-                        workload_min = generation.teachers[teacherId]["workload"]
-                # for teacherId in range(teacher_length):
-                #     if generation.teachers[count]["workload"] < workload_min :
-                #         teacherId = count
-                #         workload_min = generation.teachers[count]["workload"]
-                subject["teacher"] = teacherId
-                generation.teachers[teacherId]["workload"] += subtime_sum
-                generation.teachers[teacherId]["subject"].append({"cluster" : clusterId,
-                                                                  "subject" : subjectId,
-                                                                  "subtime" : subtime_sum})
-                # subject["course"] = list()
+                # teacher_length = len(generation.subject[subjectId]["teacher"])
+                if generation.subject[subjectId]["teacher"] != []:
+                    for teacherId in generation.subject[subjectId]["teacher"]:
+                        if generation.teachers[teacherId]["workload"] < workload_min:
+                            workload_min = generation.teachers[teacherId]["workload"]
+                            teacher_min_Id = teacherId
+                    # for teacherId in range(teacher_length):
+                    #     if generation.teachers[count]["workload"] < workload_min :
+                    #         teacherId = count
+                    #         workload_min = generation.teachers[count]["workload"]
+                    subject["teacher"] = teacher_min_Id
+                    generation.teachers[teacher_min_Id]["workload"] += subtime_sum
+                    generation.teachers[teacher_min_Id]["subject"].append({"cluster": clusterId,
+                                                                           "subject": subjectId,
+                                                                           "subtime": subtime_sum})
+                    # subject["course"] = list()
 
-                # course_list = cluster_dict[clusterId]["sub2cou"][subjectId]
-                # for course in course_list:
-                #     for i in range(generation.courses[course]["period"]):
-                #         b = Schedule(course, clusterId, teacherId, generation.courses[course]["unitId"])
-                #         subject["course"].append(b)
-                #         time_num += 1
-                # subject_arrange.append(subject)
-                cluster_arrange[clusterId]["subject"].append(subject)
+                    # course_list = cluster_dict[clusterId]["sub2cou"][subjectId]
+                    # for course in course_list:
+                    #     for i in range(generation.courses[course]["period"]):
+                    #         b = Schedule(course, clusterId, teacherId, generation.courses[course]["unitId"])
+                    #         subject["course"].append(b)
+                    #         time_num += 1
+                    # subject_arrange.append(subject)
+                    cluster_arrange[clusterId]["subject"].append(subject)
+                else:
+                    string = "subject " + str(subjectId) + " dont have teachers\n"
+                    error_control.error_info_generate(string)
         return cluster_arrange
 
 def result_disply(schedules, plan, successMark):

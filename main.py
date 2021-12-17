@@ -4,6 +4,7 @@ from genetic import *
 from pandas import *
 from generation import *
 import os
+import error_control
 
 path = 'result.json'
 if os.path.exists(path):  # 如果文件存在
@@ -20,6 +21,7 @@ bestSchedule,successMark= ga.evolution(cluster_arrange=cluster_arrange, plan= pl
 
 schedule_result = result_disply(bestSchedule, plan, successMark)
 
+error_control.error_info_display()
 write2json(schedule_result)
 # def NumOfCluster(plan):
 #     total_subject_time = 0

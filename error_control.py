@@ -11,3 +11,17 @@ def error_info(error_code = 300):
         f.write(result)
         f.close()
     return result
+
+information = list()
+
+def error_info_generate(string):
+    global information
+    information.append(string)
+
+def error_info_display():
+    global information
+    with open('error.txt', 'w') as f:
+        for reason in information:
+            f.write(reason)
+        f.close()
+    return

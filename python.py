@@ -47,6 +47,6 @@ while(left < right):
         right = mid - 1
     mid = (left + right) // 2
 
-
+error_control.error_info_display()
 write2json(schedule_result)
 
