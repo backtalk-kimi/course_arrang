@@ -26,6 +26,7 @@ class generation():
     schedule = content['schedule']
 
     def __init__(self):
+        error_control.error_init(generation.schedule["orgId"])
         generation.subject_info(self)
         generation.schedule_info_read(self)
         generation.tool_info(self)
@@ -123,11 +124,15 @@ class generation():
                         generation.subject[j]["teacher"].append(count)
                     else:
                         print("No",count,"teacher is free")
+                        string = "No " + str(count) + " teacher is free"
+                        error_control.error_info_generate(string)
             else:
                 if sub in generation.subject:
                     generation.subject[sub]["teacher"].append(count)
                 else:
                     print("No",count,"teacher is free")
+                    string = "No " + str(count) + " teacher is free"
+                    error_control.error_info_generate(string)
             # 在teacher字典中加入给每个老师安排课程和工作量安排
             i["workload"] = 0
             i["subject"] = list()

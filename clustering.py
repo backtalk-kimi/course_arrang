@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
-
+import error_control
 
 class cluster:
     def __init__(self, plan, cluster_num = 3):
@@ -63,6 +63,13 @@ class cluster:
             cluster_dict[i]["goalId"] = list()
             for j in cluster_dict[i]["students"]:
                 cluster_dict[i]["goalId"] = cluster_dict[i]["goalId"] + plan.students[j]["goalId"]
+            # # 统计各个goal的权重
+            # goal_weight = dict()
+            # goal_set = set(cluster_dict[i]["goalId"])
+            # for goal in goal_set:
+            #     goal_weight[goal] = cluster_dict[i]["goalId"].count(goal)
+            # cluster_dict[i][goal_weight] = goal_weight
+
             cluster_dict[i]["goalId"] = list(set(cluster_dict[i]["goalId"]))
             cluster_dict[i]["goalId"].sort()
             # print(i, cluster_dict[i]["goalId"])
@@ -85,9 +92,8 @@ class cluster:
             for j in cluster_dict[i]["goalId"]:
                 if j not in id2course:
                     print("goal",j,"has no course")
-                    # global infomation
-                    # infomation += 'goal,%d,has no course'%(j)
-                    # break
+                    string = "goal" + str(j) + "has no course"
+                    error_control.error_info_generate(string)
                 else:
                     cluster_course.append(id2course[j][0])
             cluster_course = list(set(cluster_course))
