@@ -1,0 +1,565 @@
+{
+   "teacherInfo": [
+      {
+         "teacherId": 300000000000168,
+         "workload": 113
+      },
+      {
+         "teacherId": 300000000000045,
+         "workload": 94
+      },
+      {
+         "teacherId": 300000000000224,
+         "workload": 89
+      },
+      {
+         "teacherId": 300000000000215,
+         "workload": 77
+      },
+      {
+         "teacherId": 300000000000238,
+         "workload": 75
+      },
+      {
+         "teacherId": 300000000000229,
+         "workload": 67
+      },
+      {
+         "teacherId": 300000000000225,
+         "workload": 67
+      },
+      {
+         "teacherId": 300000000000240,
+         "workload": 67
+      },
+      {
+         "teacherId": 300000000000226,
+         "workload": 66
+      },
+      {
+         "teacherId": 300000000000241,
+         "workload": 63
+      },
+      {
+         "teacherId": 300000000000239,
+         "workload": 63
+      },
+      {
+         "teacherId": 300000000000166,
+         "workload": 61
+      },
+      {
+         "teacherId": 300000000000210,
+         "workload": 61
+      },
+      {
+         "teacherId": 300000000000218,
+         "workload": 56
+      },
+      {
+         "teacherId": 300000000000216,
+         "workload": 54
+      },
+      {
+         "teacherId": 300000000000231,
+         "workload": 51
+      },
+      {
+         "teacherId": 300000000000223,
+         "workload": 48
+      },
+      {
+         "teacherId": 300000000000230,
+         "workload": 48
+      },
+      {
+         "teacherId": 300000000000217,
+         "workload": 43
+      },
+      {
+         "teacherId": 300000000000221,
+         "workload": 42
+      },
+      {
+         "teacherId": 300000000000212,
+         "workload": 41
+      },
+      {
+         "teacherId": 300000000000213,
+         "workload": 40
+      },
+      {
+         "teacherId": 300000000000219,
+         "workload": 39
+      },
+      {
+         "teacherId": 300000000000220,
+         "workload": 39
+      },
+      {
+         "teacherId": 300000000000018,
+         "workload": 38
+      },
+      {
+         "teacherId": 300000000000152,
+         "workload": 36
+      },
+      {
+         "teacherId": 300000000000234,
+         "workload": 35
+      },
+      {
+         "teacherId": 300000000000237,
+         "workload": 33
+      },
+      {
+         "teacherId": 300000000000236,
+         "workload": 33
+      },
+      {
+         "teacherId": 300000000000211,
+         "workload": 31
+      },
+      {
+         "teacherId": 300000000000209,
+         "workload": 27
+      },
+      {
+         "teacherId": 300000000000228,
+         "workload": 27
+      },
+      {
+         "teacherId": 300000000000232,
+         "workload": 26
+      },
+      {
+         "teacherId": 300000000000233,
+         "workload": 26
+      },
+      {
+         "teacherId": 300000000000242,
+         "workload": 26
+      },
+      {
+         "teacherId": 300000000000243,
+         "workload": 26
+      },
+      {
+         "teacherId": 300000000000235,
+         "workload": 21
+      },
+      {
+         "teacherId": 300000000000246,
+         "workload": 21
+      },
+      {
+         "teacherId": 300000000000244,
+         "workload": 20
+      },
+      {
+         "teacherId": 300000000000227,
+         "workload": 15
+      },
+      {
+         "teacherId": 300000000000247,
+         "workload": 0
+      },
+      {
+         "teacherId": 300000000000167,
+         "workload": 0
+      },
+      {
+         "teacherId": 300000000000252,
+         "workload": 0
+      }
+   ],
+   "classInfo": [
+      {
+         "classId": 0,
+         "totalLessonNum": 162,
+         "subject": [
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000166,
+               "lessonNum": 61
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000224,
+               "lessonNum": 40
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000225,
+               "lessonNum": 27
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000226,
+               "lessonNum": 34
+            }
+         ]
+      },
+      {
+         "classId": 1,
+         "totalLessonNum": 61,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000045,
+               "lessonNum": 47
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000018,
+               "lessonNum": 14
+            }
+         ]
+      },
+      {
+         "classId": 2,
+         "totalLessonNum": 47,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000045,
+               "lessonNum": 47
+            }
+         ]
+      },
+      {
+         "classId": 3,
+         "totalLessonNum": 24,
+         "subject": [
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000018,
+               "lessonNum": 24
+            }
+         ]
+      },
+      {
+         "classId": 4,
+         "totalLessonNum": 193,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000221,
+               "lessonNum": 42
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000243,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000152,
+               "lessonNum": 36
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000244,
+               "lessonNum": 20
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000238,
+               "lessonNum": 27
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000239,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000240,
+               "lessonNum": 16
+            }
+         ]
+      },
+      {
+         "classId": 5,
+         "totalLessonNum": 260,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000220,
+               "lessonNum": 39
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000241,
+               "lessonNum": 63
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000213,
+               "lessonNum": 40
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000242,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000238,
+               "lessonNum": 24
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000239,
+               "lessonNum": 16
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000240,
+               "lessonNum": 31
+            },
+            {
+               "subjectId": 8,
+               "teacherId": 300000000000246,
+               "lessonNum": 21
+            }
+         ]
+      },
+      {
+         "classId": 6,
+         "totalLessonNum": 211,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000219,
+               "lessonNum": 39
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000236,
+               "lessonNum": 33
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000212,
+               "lessonNum": 41
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000237,
+               "lessonNum": 33
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000238,
+               "lessonNum": 24
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000239,
+               "lessonNum": 21
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000240,
+               "lessonNum": 20
+            }
+         ]
+      },
+      {
+         "classId": 7,
+         "totalLessonNum": 199,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000218,
+               "lessonNum": 56
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000234,
+               "lessonNum": 35
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000211,
+               "lessonNum": 31
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000235,
+               "lessonNum": 21
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000229,
+               "lessonNum": 19
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000230,
+               "lessonNum": 19
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000231,
+               "lessonNum": 18
+            }
+         ]
+      },
+      {
+         "classId": 8,
+         "totalLessonNum": 207,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000217,
+               "lessonNum": 43
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000233,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000210,
+               "lessonNum": 61
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000232,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000229,
+               "lessonNum": 22
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000230,
+               "lessonNum": 14
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000231,
+               "lessonNum": 15
+            }
+         ]
+      },
+      {
+         "classId": 9,
+         "totalLessonNum": 182,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000216,
+               "lessonNum": 54
+            },
+            {
+               "subjectId": 2,
+               "teacherId": 300000000000228,
+               "lessonNum": 27
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000209,
+               "lessonNum": 27
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000227,
+               "lessonNum": 15
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000229,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000230,
+               "lessonNum": 15
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000231,
+               "lessonNum": 18
+            }
+         ]
+      },
+      {
+         "classId": 10,
+         "totalLessonNum": 187,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000215,
+               "lessonNum": 43
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000168,
+               "lessonNum": 61
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000223,
+               "lessonNum": 24
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000224,
+               "lessonNum": 26
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000225,
+               "lessonNum": 17
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000226,
+               "lessonNum": 16
+            }
+         ]
+      },
+      {
+         "classId": 11,
+         "totalLessonNum": 172,
+         "subject": [
+            {
+               "subjectId": 1,
+               "teacherId": 300000000000215,
+               "lessonNum": 34
+            },
+            {
+               "subjectId": 3,
+               "teacherId": 300000000000168,
+               "lessonNum": 52
+            },
+            {
+               "subjectId": 4,
+               "teacherId": 300000000000223,
+               "lessonNum": 24
+            },
+            {
+               "subjectId": 5,
+               "teacherId": 300000000000224,
+               "lessonNum": 23
+            },
+            {
+               "subjectId": 6,
+               "teacherId": 300000000000225,
+               "lessonNum": 23
+            },
+            {
+               "subjectId": 7,
+               "teacherId": 300000000000226,
+               "lessonNum": 16
+            }
+         ]
+      }
+   ]
+}
