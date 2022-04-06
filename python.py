@@ -8,14 +8,19 @@ import error_control
 
 plan = generation()
 class_arrange = plan.Arrange()
-
-# arrange_info = plan.ArrangeAdjust()
-arrange_info = plan.ArrangeDisplay()
-error_control.write2json(arrange_info, 'arrange.json')
+successMark = 0
+count = 1
 #种群规模popsize，精英个体数elite，进化代数maxiter
-ga = GeneticOptimize(popsize= 100 ,elite= 50, mutprob=0.5,crossprob = 0.4, maxiter= 100)
-bestSchedule,successMark= ga.evolution(class_arrange=class_arrange, plan= plan)
+while successMark == 0:
+    arrange_info = plan.ArrangeDisplay()
 
+    # error_control.write2json(arrange_info, arrange_path)
+    error_control.arrange_info_display(arrange_info, count)
+    ga = GeneticOptimize(popsize= 100 ,elite= 50, mutprob=0.5,crossprob = 0.4, maxiter= 100)
+    bestSchedule,successMark= ga.evolution(class_arrange=class_arrange, plan= plan)
+    adjust_teacher = ga.ConflictLocation(bestSchedule)
+    class_arrange = plan.ArrangeAdjust(adjust_teacher)
+    count += 1
 schedule_result = result_disply(bestSchedule, plan, successMark)
 
 error_control.error_info_display()

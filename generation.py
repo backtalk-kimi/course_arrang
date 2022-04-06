@@ -316,27 +316,44 @@ class generation():
             teacher["subject"] = new_list
         return
 
-    def ArrangeAdjust(self):
-        # teacher_ids = self.teacher_index[0:3]
-        teacher_ids = [1, 13, 14, 15, 15, 19, 31, 33, 12]
-        teacher_list = self.teachers
-        S_list = list()
-        for teacher_id in teacher_ids:
-            S = []
-            subject_node = teacher_list[teacher_id]["subject"][-1]
-            teacher_list[teacher_id]["subject"].remove(subject_node)
-            S.append(subject_node["class"])
-            S.append(subject_node["subject"])
-            S_list.append(S)
-        for S in S_list:
-            class_num = S[0]
-            subject_id = S[1]
-            for subject in self.class_arrange[class_num]["subject"]:
-                if subject["subjectId"] == subject_id:
-                    self.class_arrange[class_num]["times_total"] = self.class_arrange[class_num]["times_total"] - subject["subtime_sum"]
-                    self.class_arrange[class_num]["subject"].remove(subject)
+    def ArrangeAdjust(self, adjust_info):
+        adjust_list = list()
+        for teacher_id in adjust_info:
+            subject_list = adjust_info[teacher_id]
+
+            adjust_list.append([teacher_id, subject_list[0]])
+        for adjust in adjust_list:
+            class_id = adjust[1]
+            teacher_id = adjust[0]
+            for subject in self.class_arrange[class_id]["subject"]:
+                if subject["teacher"] == teacher_id:
+                    self.class_arrange[class_id]["times_total"] = self.class_arrange[class_id]["times_total"] - \
+                                                                   subject["subtime_sum"]
+                    self.class_arrange[class_id]["subject"].remove(subject)
                     break
         return self.class_arrange
+
+    # def ArrangeAdjust(self):
+    #     # teacher_ids = self.teacher_index[0:3]
+    #     teacher_ids = [1, 13, 14, 15, 15, 19, 31, 33, 12]
+    #     teacher_list = self.teachers
+    #     S_list = list()
+    #     for teacher_id in teacher_ids:
+    #         S = []
+    #         subject_node = teacher_list[teacher_id]["subject"][-1]
+    #         teacher_list[teacher_id]["subject"].remove(subject_node)
+    #         S.append(subject_node["class"])
+    #         S.append(subject_node["subject"])
+    #         S_list.append(S)
+    #     for S in S_list:
+    #         class_num = S[0]
+    #         subject_id = S[1]
+    #         for subject in self.class_arrange[class_num]["subject"]:
+    #             if subject["subjectId"] == subject_id:
+    #                 self.class_arrange[class_num]["times_total"] = self.class_arrange[class_num]["times_total"] - subject["subtime_sum"]
+    #                 self.class_arrange[class_num]["subject"].remove(subject)
+    #                 break
+    #     return self.class_arrange
 
     def ArrangeDisplay(self):
         arrange_info = dict()
@@ -349,6 +366,7 @@ class generation():
             teacher["workload"] = teacher_list[i]["workload"]
             teacher_info.append(teacher)
         class_info = list()
+        subjects_count = 0
         # arrange = self.class_arrange
         for class_node in self.class_arrange:
             node = dict()
@@ -362,8 +380,11 @@ class generation():
                 sub_info["teacherId"] = teacher_list[subject["teacher"]]["teacherId"]
                 sub_info["lessonNum"] = subject["subtime_sum"]
                 node["subject"].append(sub_info)
+                subjects_count += 1
             class_info.append(node)
-        arrange_info["teacherInfo"] = teacher_info
+
+        arrange_info["TotalSubjectNumber"] = subjects_count
+        # arrange_info["teacherInfo"] = teacher_info
         arrange_info["classInfo"] = class_info
         return arrange_info
 

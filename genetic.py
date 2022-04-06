@@ -3,6 +3,7 @@ import copy
 import numpy as np
 import random
 import error_control
+import pandas as pd
 
 class Schedule:
     def __init__(self, courseId, classId, teacherId, unitId):
@@ -262,12 +263,15 @@ class GeneticOptimize:
 
     def ConflictLocation(self, entity):
         time_list = self.EntityTimeList(entity)
-        message = ""
+        teacher_state = []
+        count = 0
         for time in time_list:
             if time:
                 for teacher_id in time["teacherId"]:
                     if time["teacherId"][teacher_id] > 1:
                         print("teacherId = {},conflict = {}".format(teacher_id, time["teacherId"][teacher_id]))
+                        data = [count, teacher_id]
+                        teacher_state.append(data)
                 for classroom in time["roomId"]:
                     if time["roomId"][classroom] > 1:
                         print("roomId = {},conflict = {}".format(classroom, time["roomId"][classroom]))
@@ -278,6 +282,40 @@ class GeneticOptimize:
                 for class_id in time["class"]:
                     if time["class"][class_id] > 1:
                         print("classId = {},conflict = {}".format(class_id, time["class"][class_id]))
+            count += 1
+        adjust_teacher = self.ConflictReason(entity, teacher_state)
+
+        return adjust_teacher
+    # def
+    def ConflictReason(self, entity, state):
+        time_list = [None] * self.times_sum
+        for clbum in entity:
+            class_id = clbum["class_id"]
+            for subject in clbum["subject"]:
+                teacher_id = subject["teacher"]
+                subject_id = subject["subject_id"]
+                for lesson in subject["course"]:
+                    time = lesson.time
+                    toolcode = lesson.tool
+                    classroom = lesson.roomId
+                    data = [teacher_id, class_id, classroom, subject_id, toolcode]
+                    if time_list[time] is None:
+                        time_list[time] = [data]
+                    else:
+                        time_list[time].append(data)
+        adjust_teacher = dict()
+        for point in state:
+            time = point[0]
+            teacher_id = point[1]
+            if teacher_id not in adjust_teacher:
+                adjust_teacher[teacher_id] = []
+            scene = time_list[time]
+            for data in scene:
+                if data[0] == teacher_id:
+                    adjust_teacher[teacher_id].append(data[1])
+        for teacher_id in adjust_teacher:
+            adjust_teacher[teacher_id] = list(set(adjust_teacher[teacher_id]))
+        return adjust_teacher
 
 
     def schedule_cost(self):
@@ -327,9 +365,9 @@ class GeneticOptimize:
             if bestScore[0] == 0:
                 bestSchedule = self.population[eliteIndex[0]]
                 break
-            else:
-                if i%20 == 0:
-                    self.ConflictLocation(self.population[eliteIndex[0]])
+            # else:
+            #     if i > 0:
+            #         self.ConflictLocation(self.population[eliteIndex[0]])
             newPopulation = [self.population[index] for index in eliteIndex]
             conflict_list = [total_conflict[index] for index in eliteIndex]
             self.rouletteRate(conflict_list)

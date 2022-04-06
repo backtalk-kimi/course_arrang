@@ -41,7 +41,7 @@ def error_init(b):
     error = os.path.join(b,'error.txt')
     result = os.path.join(b,'result.json')
     Running = os.path.join(b,'information.txt')
-    arrange = os.path.join(b,'arrange.json')
+    arrange = os.path.join(b,'arrange')
     if os.path.exists(error):  # 如果文件存在
         os.remove(error)
     if os.path.exists(result):  # 如果文件存在
@@ -49,14 +49,22 @@ def error_init(b):
     if os.path.exists(Running):  # 如果文件存在
         os.remove(Running)
     if os.path.exists(arrange):  # 如果文件存在
-        os.remove(arrange)
+        arrange_list = os.listdir(arrange)
+        for i in arrange_list:
+            a_path = os.path.join(arrange, i)
+            os.remove(a_path)
     global path
     path = b
 
-def arrange_info_display(arrange):
-    string = "TeacherInfo:\n"
-    for teacher_id in arrange:
-        return
+def arrange_info_display(info, num):
+    global path
+    arrange_path = os.path.join(path, 'arrange')
+    if not os.path.exists(arrange_path):
+        os.mkdir(arrange_path)
+    arrange = 'arrange' + str(num) + 'json'
+    arrange_path = os.path.join(arrange_path, arrange)
+    write2json(info, arrange_path)
+    return
 
 def error_info_generate(string):
     global information
