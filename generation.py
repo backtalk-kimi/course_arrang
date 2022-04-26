@@ -8,30 +8,31 @@ import numpy as np
 import time
 import datetime
 from dateutil import rrule
-from clustering import cluster
+from clustering import Cluster
 import error_control
 from genetic import *
 import random
 
 
 class generation():
-    with open('input.json', 'r', encoding='gb2312') as f:
-        content = json.load(f)
-    students = content['students']
-    teachers = content['teachers']
-    classroom = content['classrooms']
-    subject = content['subjects']
-    courses = content['courses']
-    tools = content['tools']
-    schedule = content['schedule']
 
     def __init__(self):
-        error_control.error_init(generation.schedule["orgId"])
-        generation.subject_info(self)
+        generation.input_information(self)
         generation.schedule_info_read(self)
+        generation.subject_info(self)
         generation.tool_info(self)
         generation.room_info(self)
         return
+
+    def input_information(self):
+        content = error_control.input_init()
+        generation.students = content['students']
+        generation.teachers = content['teachers']
+        generation.classroom = content['classrooms']
+        generation.subject = content['subjects']
+        generation.courses = content['courses']
+        generation.tools = content['tools']
+        generation.schedule = content['schedule']
 
 # 根据校历计算课时数
     def schedule_info_read(self):
@@ -155,7 +156,8 @@ class generation():
                 # global infomation
                 # infomation += 'course, %d, is not in subjects'%(count)
             count += 1
-        self.id2course()
+        self.GoalToCourse()
+        self.StudentCourseListGener()
         return
 # 教室信息读取
     def room_info(self):
@@ -178,8 +180,39 @@ class generation():
         generation.toolcode2num = toolcode2num
         return
 
+    # 根据GoalList生成学生的CourseList
+    def StudentCourseListGener(self):
+        std_totalLessonNum = 0
 
-    def id2course(self):
+        for student in self.students:
+            GoalList = student["goalId"]
+            CourseList = list()
+            totalLessonNum = 0
+            for goal in GoalList:
+                if goal in self.goalid2course:
+                    Course = self.goalid2course[goal][0]
+                    CourseList.append(Course)
+            CourseList = list(set(CourseList))
+            for CourseId in CourseList:
+                totalLessonNum += self.courses[Course]["period"]
+            student["course"] = CourseList
+            student["totalLessonNum"] = totalLessonNum
+            std_totalLessonNum += totalLessonNum
+            if totalLessonNum > int(self.times_sum * 0.8):
+                userId = student["idNo"]
+                infomation = "The courses of " + userId + " is too many.\n"
+                error_control.error_info_generate(infomation)
+                error_control.error_info(301)
+                exit()
+        self.std_totalLessonNum = std_totalLessonNum
+        return
+
+    def clusterNum_gener(self):
+        min_clusterNum = self.std_totalLessonNum // self.times_sum + 1
+        self.min_clusterNum = min_clusterNum
+        return min_clusterNum
+
+    def GoalToCourse(self):
         p = {}
         courses = self.courses
         for i in range(len(courses)):
@@ -200,102 +233,189 @@ class generation():
         self.goalid2course = p
         return p
 
-    def arrange(self, cluster_num):
-        clustering = cluster(self, cluster_num)
-        # clustering.display(self)
-        # subject_arrange = list()
-        cluster_dict = self.cluster_dict
-        cluster_arrange = dict()
-
-        for clusterId in cluster_dict:
-            cluster_arrange[clusterId] = dict()
-            times_total = cluster_dict[clusterId]["times_total"]
-            if times_total > self.times_sum:
-                error_control.error_info(301)
-            cluster_arrange[clusterId]["times_total"] = times_total
-            cluster_arrange[clusterId]["subject"] = list()
-
-            for subjectId in cluster_dict[clusterId]["sub2cou"]:
-                length = len(cluster_dict[clusterId]["sub_times"][subjectId])
-                subtime_sum = cluster_dict[clusterId]["sub_times"][subjectId][length - 1]
-                # a = list(range(self.times_sum))
-                # a = random.sample(a, subtime_sum)
-
-                # a.sort()
-                # time_num = 0
-
-                subject = dict()
-                subject["cluster"] = clusterId
-                subject["subjectId"] = subjectId
-                subject["subtime_sum"] = subtime_sum
+    def Arrange(self):
+        clustering = Cluster(self)
+        cluster_list = clustering.ClusterSpectral(self)
+        # cluster_arrange = dict()
+        class_id = 0
+        class_arrange = list()
+        for cluster in cluster_list:
+            class_info = dict()
+            class_info["classId"] = class_id
+            class_info["subject"] = list()
+            class_info["timesTotal"] = 0
+            for subject_id in cluster["subject"]:
+                subject_info = dict()
+                subject_info["subtimeSum"] = 0
+                subject_info["subjectId"] = subject_id
+                subject_info["course"] = list()
+                for course in cluster["subject"][subject_id]:
+                    course_info = copy.deepcopy(course)
+                    course_id = course["courseId"]
+                    course_info["courseId"] = course_id
+                    course_info["period"] = self.courses[course_id]["period"]
+                    course_info["typeId"] = self.courses[course_id]["typeId"]
+                    if "toolsCode" in self.courses[course_id]:
+                        course_info["toolsCode"] = self.courses[course_id]["toolsCode"]
+                    # course_info["unitId"] = self.courses[course_id]["unitId"]
+                    subject_info["subtimeSum"] += course_info["period"]
+                    subject_info["course"].append(course_info)
+                class_info["subject"].append(subject_info)
+                class_info["timesTotal"] += subject_info["subtimeSum"]
+            class_arrange.append(class_info)
+            class_id += 1
+        for class_info in class_arrange:
+            for subject_info in class_info["subject"]:
+                subject_id = subject_info["subjectId"]
                 workload_min = 65535
-                # teacher_length = len(generation.subject[subjectId]["teacher"])
-                if generation.subject[subjectId]["teacher"] != []:
-                    for teacherId in generation.subject[subjectId]["teacher"]:
-                        if generation.teachers[teacherId]["workload"] < workload_min:
-                            workload_min = generation.teachers[teacherId]["workload"]
-                            teacher_min_Id = teacherId
-                    # for teacherId in range(teacher_length):
-                    #     if generation.teachers[count]["workload"] < workload_min :
-                    #         teacherId = count
-                    #         workload_min = generation.teachers[count]["workload"]
-                    subject["teacher"] = teacher_min_Id
-                    generation.teachers[teacher_min_Id]["workload"] += subtime_sum
-                    generation.teachers[teacher_min_Id]["subject"].append({"cluster": clusterId,
-                                                                           "subject": subjectId,
-                                                                           "subtime": subtime_sum})
-                    # subject["course"] = list()
+                for teacher_no in self.subject[subject_id]["teacher"]:
+                    if self.teachers[teacher_no]["workload"] < workload_min:
+                        workload_min = self.teachers[teacher_no]["workload"]
+                        teacher_min_Id = teacher_no
+                subject_info["teacher"] = teacher_min_Id
+                self.teachers[teacher_min_Id]["workload"] += subject_info["subtimeSum"]
+                self.teachers[teacher_min_Id]["subject"].append({
+                                                                    "class": class_info["classId"],
+                                                                    "subject": subject_id,
+                                                                    "subtime": subject_info["subtimeSum"]
+                                                                })
+        self.class_arrange = class_arrange
+        self.TeacherWorkloadSort()
+        return class_arrange
 
-                    # course_list = cluster_dict[clusterId]["sub2cou"][subjectId]
-                    # for course in course_list:
-                    #     for i in range(generation.courses[course]["period"]):
-                    #         b = Schedule(course, clusterId, teacherId, generation.courses[course]["unitId"])
-                    #         subject["course"].append(b)
-                    #         time_num += 1
-                    # subject_arrange.append(subject)
-                    cluster_arrange[clusterId]["subject"].append(subject)
-                else:
-                    string = "subject " + str(subjectId) + " dont have teachers\n"
-                    error_control.error_info_generate(string)
-        return cluster_arrange
+    def ArrangeAdjust(self, adjust_info):
+        adjust_list = list()
+        for teacher_id in adjust_info:
+            subject_list = adjust_info[teacher_id]
+
+            adjust_list.append([teacher_id, subject_list[0]])
+        for adjust in adjust_list:
+            class_id = adjust[1]
+            teacher_id = adjust[0]
+            for subject in self.class_arrange[class_id]["subject"]:
+                if subject["teacher"] == teacher_id:
+                    self.class_arrange[class_id]["timeTotal"] = self.class_arrange[class_id]["timesTotal"] - \
+                                                                  subject["subtimeSum"]
+                    self.class_arrange[class_id]["subject"].remove(subject)
+                    self.teachers[teacher_id]["workload"] -= subject["subtimeSum"]
+                    for subject in self.teachers[teacher_id]["subject"]:
+                        if subject["class"] == class_id:
+                            self.teachers[teacher_id]["subject"].remove(subject)
+                            break
+                    break
+        self.TeacherWorkloadSort()
+        return self.class_arrange
+
+    def TeacherWorkloadSort(self):
+        teacher_list = self.teachers
+        teacher_workload = list(map(lambda x: x["workload"], teacher_list))
+        index = np.array(teacher_workload).argsort()
+        index = list(reversed(index))
+        self.teacher_index = index
+
+        for teacher in self.teachers:
+            class_lesson = list(map(lambda x:x["subtime"],teacher["subject"]))
+            indexes = np.array(class_lesson).argsort()
+            new_list = list()
+            for index in indexes:
+                new_list.append(teacher["subject"][index])
+            teacher["subject"] = new_list
+        return
+
+    def ArrangeDisplay(self):
+        arrange_info = dict()
+        teacher_info = list()
+        index = self.teacher_index
+        teacher_list = self.teachers
+        for i in index:
+            teacher = dict()
+            teacher["teacherId"] = teacher_list[i]["teacherId"]
+            teacher["workload"] = teacher_list[i]["workload"]
+            teacher_info.append(teacher)
+        class_info = list()
+        subjects_count = 0
+        # arrange = self.class_arrange
+        for class_node in self.class_arrange:
+            node = dict()
+            # class_id = clbum["subject"][0]["classId"]
+            node["classId"] = class_node["classId"]
+            node["totalLessonNum"] = class_node["timesTotal"]
+            node["subject"] = list()
+            for subject in class_node["subject"]:
+                sub_info = dict()
+                sub_info["subjectId"] = subject["subjectId"]
+                sub_info["teacherId"] = teacher_list[subject["teacher"]]["teacherId"]
+                sub_info["lessonNum"] = subject["subtimeSum"]
+                node["subject"].append(sub_info)
+                subjects_count += 1
+            class_info.append(node)
+
+        arrange_info["TotalSubjectNumber"] = subjects_count
+        arrange_info["teacherInfo"] = teacher_info
+        arrange_info["classInfo"] = class_info
+        return arrange_info
+
+
+def student_info_display(studentNo, plan, cluster_info):
+    student_info = copy.deepcopy(cluster_info)
+    del student_info["subjectId"]
+    del student_info["sub2unitId"]
+    student_info["unitId"] = list()
+    student_info["subjectId"] = list()
+    for courseId in plan.students[studentNo]["course"]:
+        student_info["unitId"].append(plan.courses[courseId]["lessonNo"])
+    for subjectId in cluster_info["subjectId"]:
+        set1 = set(cluster_info["sub2unitId"][subjectId])
+        set2 = set(student_info["unitId"])
+        if set1 & set2 :
+            student_info["subjectId"].append(subjectId)
+    student_info["userId"] = plan.students[studentNo]["idNo"]
+    student_info["classId"] = plan.students[studentNo]["classId"]
+    student_info["goalId"] = plan.students[studentNo]["goalId"]
+
+    return student_info
+
 
 def result_disply(schedules, plan, successMark):
     time_list = [None] * plan.times_sum
-    for subject in schedules:
-        teacher = subject["teacher"]
-        cluster = subject["cluster"]
-        subjectId = subject["subjectId"]
-        for course in subject["course"]:
-            time = course.time
-            room = course.roomId
-            toolcode = course.tool
+    class_count = 0
+    for clumb in schedules:
+        class_id = clumb["class_id"]
+        subject_list = clumb["subject"]
+        subject_count = 0
+        for subject in subject_list:
+            subject_id = subject["subject_id"]
+            teacher_id = subject["teacher"]
+            course_count = 0
+            count = 0
+            for course in subject["course"]:
+                time = course.time
+                room = course.roomId
+                toolcode = course.tool
+                course_id = course.courseId
 
-            courseId = course.courseId
-            if time_list[time]:
-                lesson = {"cluster" : cluster,
-                          "teacher" : plan.teachers[teacher]["teacherId"],
-                          "lessonNo" : plan.courses[courseId]["lessonNo"],
-                          "classroomNo" : plan.classroom[room]["classroomNo"],
-                          "unitId" : course.unitId,
-                          "subjectId" : subjectId}
+                course_info = plan.class_arrange[class_count]["subject"][subject_count]["course"][course_count]
+                period = course_info["period"]
+
+                if not time_list[time]:
+                    time_list[time] = list()
+                lesson = {"cluster": class_id,
+                          "teacher": plan.teachers[teacher_id]["teacherId"],
+                          "lessonNo": plan.courses[course_id]["lessonNo"],
+                          "classroomNo": plan.classroom[room]["classroomNo"],
+                          "unitId": plan.courses[course_id]["unitId"],
+                          "studentId": course_info["students"],
+                          "subjectId": subject_id}
                 if toolcode != -1:
-                    # toolId = plan.toolcode2Id[toolcode]
-                    # lesson["tool"] = plan.tools[toolId]["code"]
                     lesson["tool"] = toolcode
                 time_list[time].append(lesson)
-            else:
-                time_list[time] = list()
-                lesson = {"cluster": cluster,
-                          "teacher": plan.teachers[teacher]["teacherId"],
-                          "lessonNo": plan.courses[courseId]["lessonNo"],
-                          "classroomNo": plan.classroom[room]["classroomCode"],
-                          "unitId": course.unitId,
-                          "subjectId" : subjectId}
-                if toolcode != -1:
-                    # toolId = plan.toolcode2Id[toolcode]
-                    # lesson["tool"] = plan.tools[toolId]["code"]
-                    lesson["tool"] = toolcode
-                time_list[time].append(lesson)
+                count += 1
+                if count == period:
+                    count = 0
+                    course_count += 1
+
+            subject_count += 1
+        class_count += 1
 
     start = 0
     end = 0
@@ -350,6 +470,7 @@ def result_disply(schedules, plan, successMark):
                     new_dict["startTime"]   = "00:00:00"            #数据缺失
                     new_dict["endTime"]     = "00:00:00"            #数据缺失
                     new_dict["tmpClassId"]  = tmpClassId
+                    new_dict["studentId"] = lesson["studentId"]
                     new_dict["statusFlag"]  = 1
 
                     timeTableList.append(new_dict)
@@ -367,53 +488,48 @@ def result_disply(schedules, plan, successMark):
         result["msg"] = "fail"
     result["data"] = dict()
 
-    sortNumber = 1
-    cluster_result = list()
-    for clusterID in plan.cluster_dict:
-        cluster_info = dict()
-        cluster_info["semester"] = plan.schedule["semester"]
+    # sortNumber = 1
+    # student_result = list()
 
-        # cluster_info["userId"] = list()
-        # cluster_info["classId"] = list()
+    # class_id = 0
+    # for classes in plan.class_arrange:
+    #     class_info = dict()
+    #     class_info["semester"] = plan.schedule["semester"]
+    #     class_info["subjectId"] = classes["subejct"]
+    #     class_info["sub2unitId"] = dict()
+    #     class_info["orgId"] = plan.schedule["orgId"]
+    #     class_info["statusFlag"] = 1
+    #     # cluster_info["sortNumber"] = sortNumber
+    #     class_info["tmpClassId"] = '%015d' % class_id
+    #     for studentNo in classes["students"]:
+    #         student_info = student_info_display(studentNo, plan, cluster_info)
+    #         student_info["sortNumber"] = sortNumber
+    #         sortNumber += 1
+    #         student_result.append(student_info)
+    #
+        # class_info = dict()
+        # class_info["semester"] = plan.schedule["semester"]
+        # class_info["subjectId"] = list()
+        # class_info["sub2unitId"] = dict()
+        # for subjectId in plan.class_arrange[clusterID]["sub2cou"]:
+        #     class_info["subjectId"].append(subjectId)
+        #     class_info["sub2unitId"][subjectId] = list()
+        #     for courseNo in plan.cluster_dict[clusterID]["sub2cou"][subjectId]:
+        #         lessonNo = plan.courses[courseNo]["lessonNo"]
+        #         cluster_info["sub2unitId"][subjectId].append(lessonNo)
+        # cluster_info["orgId"] = plan.schedule["orgId"]
+        # cluster_info["statusFlag"] = 1
+        # # cluster_info["sortNumber"] = sortNumber
+        # cluster_info["tmpClassId"] = '%015d' % clusterID
         # for studentNo in plan.cluster_dict[clusterID]["students"]:
-        #     cluster_info["userId"].append(plan.students[studentNo]["idNo"])
-        #     cluster_info["classId"].append(plan.students[studentNo]["classId"])
-        #
-        # cluster_info["goalId"] = list()
-        # for goal in plan.cluster_dict[clusterID]["goalId"]:
-        #     cluster_info["goalId"].append(goal)
+        #     student_info = student_info_display(studentNo, plan, cluster_info)
+        #     student_info["sortNumber"] = sortNumber
+        #     sortNumber += 1
+        #     student_result.append(student_info)
 
-        cluster_info["subjectId"] = list()
-        cluster_info["unitId"] = list()
-        for subjectId in plan.cluster_dict[clusterID]["sub2cou"]:
-            cluster_info["subjectId"].append(subjectId)
-            for courseNo in plan.cluster_dict[clusterID]["sub2cou"][subjectId]:
-                lessonNo = plan.courses[courseNo]["lessonNo"]
-                cluster_info["unitId"].append(lessonNo)
-
-        cluster_info["totalLessonNum"] = plan.cluster_dict[clusterID]["times_total"]
-        cluster_info["orgId"] = plan.schedule["orgId"]
-        cluster_info["statusFlag"] = 1
-        # cluster_info["sortNumber"] = sortNumber
-        cluster_info["tmpClassId"] = '%015d' % clusterID
-
-        # sortNumber += 1
-        # cluster_result.append(cluster_info)
-        for studentNo in plan.cluster_dict[clusterID]["students"]:
-            cluster_info["userId"] = plan.students[studentNo]["idNo"]
-            cluster_info["classId"] = plan.students[studentNo]["classId"]
-            cluster_info["goalId"] = plan.students[studentNo]["goalId"]
-            cluster_info["sortNumber"] = sortNumber
-            sortNumber += 1
-            cluster_result.append(copy.deepcopy(cluster_info))
-
-    result["data"]["studentTimeTableList"] = cluster_result
+    # result["data"]["studentTimeTableList"] = student_result
     result["data"]["timeTableList"] = timeTableList
-    result = json.dumps(result, indent=3, ensure_ascii=False)
-    # with open('result.json', 'w') as f:
-    #     f.write(result)
-    #     f.close()
-    # return time_list
+    # result = json.dumps(result, indent=3, ensure_ascii=False)
     return result
 
 def write2json(result):
